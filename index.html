@@ -1,0 +1,1145 @@
+```html
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codex Aetheria - Kadim Peri, Yıldız ve Takvim Ansiklopedisi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background-color: #030805;
+            color: #f7f3ed;
+            overflow-x: hidden;
+        }
+        .title-font {
+            font-family: 'Cinzel', serif;
+        }
+        /* Vitray ve Sedef Pembe/Altın Temalar */
+        .theme-sunset {
+            background: linear-gradient(135deg, rgba(12, 6, 11, 0.99), rgba(35, 12, 28, 0.97)),
+                        radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.22) 0%, transparent 75%);
+        }
+        .theme-emerald {
+            background: linear-gradient(135deg, rgba(4, 14, 9, 0.99), rgba(10, 30, 18, 0.97)),
+                        radial-gradient(circle at 50% 10%, rgba(72, 187, 120, 0.2) 0%, transparent 75%);
+        }
+        .theme-midnight {
+            background: linear-gradient(135deg, rgba(6, 9, 17, 0.99), rgba(12, 19, 36, 0.97)),
+                        radial-gradient(circle at 50% 10%, rgba(147, 197, 253, 0.2) 0%, transparent 75%);
+        }
+        
+        .parchment-box {
+            background: linear-gradient(145deg, #fdf6ec, #ede0cb);
+            color: #24160c;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 40px rgba(212, 175, 55, 0.25);
+            border: 2px solid #d4af37;
+        }
+        .parchment-card {
+            background: linear-gradient(135deg, #faf2e4, #e6d1b2);
+            color: #2b1d11;
+            border: 1px solid #d4af37;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .parchment-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 18px 45px rgba(212, 175, 55, 0.45);
+        }
+        .gold-border {
+            border: 2px solid #d4af37;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+        }
+        .gold-text {
+            color: #f3d475;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+        }
+        .stained-border {
+            border: 4px ridge #d4af37;
+            border-radius: 1.25rem;
+            position: relative;
+            background: rgba(8, 18, 11, 0.94);
+        }
+        .stained-border::before {
+            content: "✦";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0 14px;
+            color: #d4af37;
+            font-size: 1.3rem;
+            background: #030805;
+        }
+        #star-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+        ::-webkit-scrollbar {
+            width: 9px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030805;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4af37;
+            border-radius: 4px;
+        }
+        .interactive-tab-btn.active {
+            background-color: #d4af37;
+            color: #030805;
+            border-color: #ffd700;
+        }
+        .fairy-script {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.2em;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+        }
+    </style>
+</head>
+<body id="body-theme" class="theme-sunset min-h-screen relative selection:bg-pink-900 selection:text-amber-200">
+
+    <!-- Yıldız Tozu Kanvası -->
+    <canvas id="star-canvas"></canvas>
+
+    <!-- Üst Sabit Navigasyon -->
+    <header class="sticky top-0 z-40 bg-[#030805]/95 backdrop-blur-md border-b-2 border-amber-500/40 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl text-amber-400">✨</span>
+                <div>
+                    <h1 class="title-font text-lg md:text-xl font-bold tracking-widest gold-text">Codex Aetheria</h1>
+                    <p class="text-xs text-stone-300 italic">100+ Maddelik Kadim Peri, Yıldız ve Takvim Portalı</p>
+                </div>
+            </div>
+
+            <!-- Anlık Arama Kutusu -->
+            <div class="w-full md:w-72 relative">
+                <input type="text" id="wiki-search" oninput="handleSearch(this.value)" placeholder="100+ maddede ara..." class="w-full px-4 py-2 rounded-full bg-[#0a1710] border border-amber-500/50 text-amber-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-stone-400">
+                <span class="absolute right-3 top-2.5 text-amber-400 text-sm">🔍</span>
+            </div>
+
+            <nav class="flex flex-wrap items-center justify-center gap-3 text-xs md:text-sm font-semibold tracking-wide">
+                <a href="#kategoriler" class="hover:text-amber-300 transition-colors">Kategoriler</a>
+                <a href="#atolye" class="hover:text-amber-300 transition-colors">🎨 Kanat Atölyesi</a>
+                <a href="#laboratuvar" class="hover:text-amber-300 transition-colors">🧪 Büyü Lab</a>
+                <a href="#favoriler" class="hover:text-amber-300 transition-colors">⭐ Favoriler (<span id="fav-count">0</span>)</a>
+                <div class="flex items-center gap-1 bg-[#0a1710] border border-amber-500/40 rounded-full px-2 py-0.5">
+                    <button onclick="setTheme('sunset')" class="w-4 h-4 rounded-full bg-pink-700 hover:scale-110 transition-transform" title="Sedef Pembe Vitray"></button>
+                    <button onclick="setTheme('emerald')" class="w-4 h-4 rounded-full bg-emerald-700 hover:scale-110 transition-transform" title="Zümrüt Orman"></button>
+                    <button onclick="setTheme('midnight')" class="w-4 h-4 rounded-full bg-blue-900 hover:scale-110 transition-transform" title="Gece Yarısı Ay Işığı"></button>
+                </div>
+                <button onclick="toggleAudio()" id="audio-toggle-btn" class="px-3 py-1 bg-amber-900/60 hover:bg-amber-900 text-amber-200 rounded-full text-xs font-bold border border-amber-500/40 transition-all">
+                    🎶 Müzik: Kapalı
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Ana İçerik -->
+    <main class="max-w-7xl mx-auto px-4 py-10 space-y-16 relative z-10">
+
+        <!-- GİRİŞ BÖLÜMÜ -->
+        <section class="relative parchment-box p-8 md:p-14 rounded-3xl shadow-2xl overflow-hidden">
+            <div class="absolute top-4 right-4 text-8xl opacity-15 select-none pointer-events-none text-amber-900">🌸</div>
+            <div class="absolute bottom-4 left-4 text-8xl opacity-15 select-none pointer-events-none text-amber-900">⭐</div>
+
+            <div class="max-w-3xl mx-auto text-center space-y-6 relative z-10">
+                <p class="title-font uppercase tracking-widest text-xs md:text-sm text-amber-900 font-bold">Cilt C • Vitray Camlar ve Yıldız Tozu Arşivi</p>
+                <h2 class="title-font text-3xl md:text-5xl font-extrabold text-[#24160c] leading-tight">Codex Aetheria: Kadim Peri Ansiklopedisi</h2>
+                <div class="w-32 h-1 bg-gradient-to-r from-transparent via-amber-700 to-transparent mx-auto"></div>
+                <p class="text-lg md:text-xl italic leading-relaxed text-[#3a2618] font-medium">
+                    "Antika vitray pencerelerden süzülen sedef pembe gün batımları, kadim peri takvimleri, göksel yıldız hizalanmaları ve 100'den fazla mistik kabilenin gizli bilgeliği burada buluşuyor."
+                </p>
+                <div class="flex flex-wrap justify-center gap-4 pt-2">
+                    <button onclick="playChime(); filterCategory('hepsi')" class="px-6 py-2.5 bg-amber-900 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest hover:bg-amber-950 transition-colors shadow-lg">Tüm 100+ Maddeyi Keşfet</button>
+                    <button onclick="playChime(); openRandomArticle()" class="px-6 py-2.5 bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest shadow-md hover:from-amber-700 hover:to-amber-900 transition-all">Rastgele Madde Çek 🎲</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. İNTERAKTİF PERİ ÇARKI & GÜNÜN KEHANETİ -->
+        <section class="stained-border p-6 md:p-10 rounded-3xl shadow-xl max-w-4xl mx-auto space-y-6">
+            <div class="text-center space-y-2">
+                <span class="text-3xl text-amber-400">🎡</span>
+                <h2 class="title-font text-2xl md:text-3xl font-bold gold-text">İnteraktif Peri Çarkı (Günün Kehaneti)</h2>
+                <p class="text-stone-300 text-sm">Çarkı çevirerek bugün hangi kadim peri kabilesinin veya yıldızın koruması altında olduğunu öğren.</p>
+            </div>
+            <div class="parchment-box p-6 rounded-2xl text-center space-y-4 max-w-xl mx-auto">
+                <div id="wheel-result-display" class="title-font text-xl md:text-2xl font-bold text-amber-900">
+                    ✨ Çarkı Çevirmek İçin Butona Dokunun ✨
+                </div>
+                <p id="wheel-desc-display" class="text-xs text-stone-700 italic">Kader çarkı vitray pencerelerdeki ışıkla dönmeye hazır.</p>
+                <div class="pt-2">
+                    <button onclick="playChime(); spinFairyWheel()" class="px-8 py-3 bg-amber-900 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest hover:bg-amber-950 transition-colors shadow-lg">
+                        Peri Çarkını Çevir 🌀
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. PERİ KANATLARI TASARIM VE BOYAMA ATÖLYESİ -->
+        <section id="atolye" class="stained-border p-6 md:p-10 rounded-3xl shadow-xl max-w-4xl mx-auto space-y-6">
+            <div class="text-center space-y-2">
+                <span class="text-3xl text-amber-400">🎨</span>
+                <h2 class="title-font text-2xl md:text-3xl font-bold gold-text">Peri Kanatları Tasarım Atölyesi</h2>
+                <p class="text-stone-300 text-sm">Kendi kişisel peri kanatlarını şekillendir ve vitray renk paletiyle boyayarak kaydet.</p>
+            </div>
+            <div class="parchment-box p-6 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block title-font text-xs font-bold text-amber-900 mb-1">Kanat Şekli</label>
+                        <select id="wing-shape" class="w-full px-3 py-2 rounded-xl bg-white border border-amber-800 text-stone-800 text-xs">
+                            <option value="Kelebek Modeli">Kelebek ve Sedef Desenli</option>
+                            <option value="Yusufçuk Modeli">Yusufçuk Uzun Kanat</option>
+                            <option value="Yıldız Tozu Modeli">Yıldız Saçaklı Peri Kanadı</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block title-font text-xs font-bold text-amber-900 mb-1">Vitray Renk Tonu</label>
+                        <select id="wing-color" class="w-full px-3 py-2 rounded-xl bg-white border border-amber-800 text-stone-800 text-xs">
+                            <option value="Sedef Pembe ve Altın">Sedef Pembe ve Altın Yaldız</option>
+                            <option value="Zümrüt Yeşili ve Orman">Zümrüt Yeşili ve Orman Gölgesi</option>
+                            <option value="Gece Mavisi ve Gümüş">Gece Mavisi ve Gümüş Işıltı</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block title-font text-xs font-bold text-amber-900 mb-1">Kanat Sahibi Adı</label>
+                        <input type="text" id="wing-owner" placeholder="Örn: Aeloria" class="w-full px-3 py-2 rounded-xl bg-white border border-amber-800 text-stone-800 text-xs">
+                    </div>
+                    <button onclick="playChime(); forgeWings()" class="w-full py-2.5 bg-amber-900 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest hover:bg-amber-950 shadow-md">
+                        Kanatları Üret ve Vitrayda Sergile ✨
+                    </button>
+                </div>
+                <div id="wing-display-box" class="p-6 bg-white/80 rounded-2xl border-2 border-amber-800/30 text-center space-y-3">
+                    <span class="text-4xl block">🧚‍♀️✨</span>
+                    <h4 id="wing-title-res" class="title-font font-bold text-base text-amber-900">Vitray Kanat Bekliyor</h4>
+                    <p id="wing-desc-res" class="text-xs text-stone-700 italic">Soldaki özellikleri seçip atölyede üret butonuna dokunun.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. DOĞUM HARİTASI VE BURÇ ANALİZCİSİ -->
+        <section class="stained-border p-6 md:p-10 rounded-3xl shadow-xl max-w-4xl mx-auto space-y-6">
+            <div class="text-center space-y-2">
+                <span class="text-3xl text-amber-400">🌟</span>
+                <h2 class="title-font text-2xl md:text-3xl font-bold gold-text">Kişisel Peri Doğum Haritası ve Burç Analizi</h2>
+                <p class="text-stone-300 text-sm">Doğum gününüzü seçerek göksel eşinizi ve peri kabilenizi keşfedin.</p>
+            </div>
+            <div class="parchment-box p-6 rounded-2xl space-y-4 max-w-xl mx-auto">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block title-font text-xs font-bold text-amber-900 mb-1">Doğum Gününüz</label>
+                        <select id="birth-day" class="w-full px-3 py-2 rounded-xl bg-white border border-amber-800 text-stone-800 text-xs">
+                            <script>
+                                for(let i=1; i<=31; i++) document.write(`<option value="${i}">${i}</option>`);
+                            </script>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block title-font text-xs font-bold text-amber-900 mb-1">Doğum Ayınız</label>
+                        <select id="birth-month" class="w-full px-3 py-2 rounded-xl bg-white border border-amber-800 text-stone-800 text-xs">
+                            <option value="1">Ocak (Kış Kristali)</option>
+                            <option value="2">Şubat (Ay Işığı)</option>
+                            <option value="3">Mart (Uyanış)</option>
+                            <option value="4">Nisan (Bahar Şafağı)</option>
+                            <option value="5">Mayıs (Beltane Çiçeği)</option>
+                            <option value="6">Haziran (Gündönümü)</option>
+                            <option value="7">Temmuz (Güneş Zirvesi)</option>
+                            <option value="8">Ağustos (Hasat Şarkısı)</option>
+                            <option value="9">Eylül (Ekinoks Dengesi)</option>
+                            <option value="10">Ekim (Sonbahar Perdesi)</option>
+                            <option value="11">Kasım (Yıldız Tozu)</option>
+                            <option value="12">Aralık (Yule Gecesi)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-center pt-2">
+                    <button onclick="playChime(); calculateFairyZodiac()" class="px-8 py-3 bg-amber-900 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest hover:bg-amber-950 transition-colors shadow-lg">
+                        Peri Doğum Haritamı Hesapla ✨
+                    </button>
+                </div>
+                <div id="zodiac-result" class="p-4 bg-white/80 rounded-xl border border-amber-900/20 text-center space-y-2 hidden">
+                    <h4 id="zodiac-title" class="title-font font-bold text-lg text-amber-900">-</h4>
+                    <p id="zodiac-desc" class="text-xs text-stone-700 italic">-</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- KATEGORİ FİLTRELERİ -->
+        <section id="kategoriler" class="space-y-6">
+            <div class="text-center space-y-2">
+                <span class="text-3xl text-amber-400">🌿</span>
+                <h2 class="title-font text-2xl md:text-4xl font-bold gold-text">Ansiklopedi Kategorileri</h2>
+                <p class="text-stone-300 text-sm">İncelemek istediğiniz kadim bilgi dalını seçin.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                <button onclick="playChime(); filterCategory('hepsi')" class="stained-border p-3.5 rounded-xl text-center hover:border-amber-300 transition-all group">
+                    <span class="text-2xl block mb-1">📜</span>
+                    <span class="title-font text-xs font-bold text-amber-200 group-hover:text-amber-400">Tümü (100+)</span>
+                </button>
+                <button onclick="playChime(); filterCategory('kabile')" class="stained-border p-3.5 rounded-xl text-center hover:border-amber-300 transition-all group">
+                    <span class="text-2xl block mb-1">🧚‍♀️</span>
+                    <span class="title-font text-xs font-bold text-amber-200 group-hover:text-amber-400">Peri Sınıfları</span>
+                </button>
+                <button onclick="playChime(); filterCategory('yildiz')" class="stained-border p-3.5 rounded-xl text-center hover:border-amber-300 transition-all group">
+                    <span class="text-2xl block mb-1">⭐</span>
+                    <span class="title-font text-xs font-bold text-amber-200 group-hover:text-amber-400">Yıldızlar</span>
+                </button>
+                <button onclick="playChime(); filterCategory('takvim')" class="stained-border p-3.5 rounded-xl text-center hover:border-amber-300 transition-all group">
+                    <span class="text-2xl block mb-1">🗓️</span>
+                    <span class="title-font text-xs font-bold text-amber-200 group-hover:text-amber-400">Takvimler</span>
+                </button>
+                <button onclick="playChime(); filterCategory('olay')" class="stained-border p-3.5 rounded-xl text-center hover:border-amber-300 transition-all group">
+                    <span class="text-2xl block mb-1">🌌</span>
+                    <span class="title-font text-xs font-bold text-amber-200 group-hover:text-amber-400">Göksel Olaylar</span>
+                </button>
+                <button onclick="playChime(); filterCategory('bitki')" class="stained-border p-3.5 rounded-xl text-center hover:border-amber-300 transition-all group">
+                    <span class="text-2xl block mb-1">🍄</span>
+                    <span class="title-font text-xs font-bold text-amber-200 group-hover:text-amber-400">Büyülü Bitkiler</span>
+                </button>
+                <button onclick="playChime(); filterCategory('artifact')" class="stained-border p-3.5 rounded-xl text-center hover:border-amber-300 transition-all group">
+                    <span class="text-2xl block mb-1">🏺</span>
+                    <span class="title-font text-xs font-bold text-amber-200 group-hover:text-amber-400">Kadim Eserler</span>
+                </button>
+                <button onclick="playChime(); filterCategory('muzik')" class="stained-border p-3.5 rounded-xl text-center hover:border-amber-300 transition-all group">
+                    <span class="text-2xl block mb-1">🎶</span>
+                    <span class="title-font text-xs font-bold text-amber-200 group-hover:text-amber-400">Peri Şarkıları</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 100+ MADDE WIKI DİZİNİ -->
+        <section id="ansiklopedi" class="space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-amber-500/30 pb-4 gap-4">
+                <div>
+                    <h2 class="title-font text-2xl md:text-3xl font-bold gold-text">Ansiklopedi Kayıtları (100+ Devasa Arşiv)</h2>
+                    <p class="text-stone-400 text-sm">Detaylı makale okumak, rüya ritüelleri ve sır sözcükler için herhangi bir karta tıklayın.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="article-count" class="text-xs text-amber-300 font-semibold uppercase tracking-wider">Toplam 100+ Madde</span>
+                </div>
+            </div>
+
+            <!-- Kart Izgarası -->
+            <div id="wiki-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JS ile dolacak -->
+            </div>
+        </section>
+
+        <!-- İNTERAKTİF BÖLÜM: BÜYÜ VE ÇEVİRİ LABORATUVARI -->
+        <section id="laboratuvar" class="space-y-10 pt-6">
+            <div class="text-center space-y-2">
+                <span class="text-3xl text-amber-400">🧪</span>
+                <h2 class="title-font text-3xl md:text-4xl font-bold gold-text">Kadim Büyü ve Çeviri Laboratuvarı</h2>
+                <p class="text-stone-300 text-sm md:text-base">İksir hazırlayın, peri dili çevirisi yapın, isminizi üretin, rüyalarınızı yorumlayın.</p>
+            </div>
+
+            <!-- Araç Sekme Butonları -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <button onclick="switchLabTab('potion')" id="btn-tab-potion" class="interactive-tab-btn active px-4 py-2.5 rounded-full border border-amber-500/50 text-xs title-font font-bold tracking-widest transition-all">🧪 İksir Lab</button>
+                <button onclick="switchLabTab('cevirici')" id="btn-tab-cevirici" class="interactive-tab-btn px-4 py-2.5 rounded-full border border-amber-500/50 text-xs title-font font-bold tracking-widest transition-all">📜 Rün Çevirici</button>
+                <button onclick="switchLabTab('name')" id="btn-tab-name" class="interactive-tab-btn px-4 py-2.5 rounded-full border border-amber-500/50 text-xs title-font font-bold tracking-widest transition-all">🌸 İsim Üreteci</button>
+                <button onclick="switchLabTab('dream')" id="btn-tab-dream" class="interactive-tab-btn px-4 py-2.5 rounded-full border border-amber-500/50 text-xs title-font font-bold tracking-widest transition-all">🌙 Rüya Yorumcusu</button>
+                <button onclick="switchLabTab('botanik')" id="btn-tab-botanik" class="interactive-tab-btn px-4 py-2.5 rounded-full border border-amber-500/50 text-xs title-font font-bold tracking-widest transition-all">🍄 Botanik Bahçe</button>
+            </div>
+
+            <!-- 1. İKSİR LABORATUVARI -->
+            <div id="lab-potion" class="stained-border p-8 md:p-10 rounded-3xl shadow-xl max-w-4xl mx-auto space-y-6">
+                <div class="text-center space-y-2">
+                    <h3 class="title-font text-2xl font-bold gold-text">Büyülü İksir ve Yıldız Tozu Laboratuvarı</h3>
+                    <p class="text-stone-300 text-sm">3 kadim malzemeyi seçip karıştırarak özel bir peri iksiri reçetesi elde edin.</p>
+                </div>
+                <div class="parchment-box p-6 rounded-2xl space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block title-font text-xs font-bold text-amber-900 mb-1">1. Malzeme (Öz)</label>
+                            <select id="pot-1" class="w-full px-3 py-2 rounded-xl bg-white border border-amber-800 text-stone-800 text-xs">
+                                <option value="gümüş çiy">Gümüş Çiy Damlası</option>
+                                <option value="ayçiçeği yaprağı">Ayçiçeği Yaprağı</option>
+                                <option value="yıldız tozu">Pleiades Yıldız Tozu</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block title-font text-xs font-bold text-amber-900 mb-1">2. Malzeme (Bitki)</label>
+                            <select id="pot-2" class="w-full px-3 py-2 rounded-xl bg-white border border-amber-800 text-stone-800 text-xs">
+                                <option value="gece menekşesi">Gece Menekşesi</option>
+                                <option value="kadim orman yosunu">Kadim Orman Yosunu</option>
+                                <option value="gümüş eğrelti">Gümüş Eğrelti Otu</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block title-font text-xs font-bold text-amber-900 mb-1">3. Malzeme (Kozmik)</label>
+                            <select id="pot-3" class="w-full px-3 py-2 rounded-xl bg-white border border-amber-800 text-stone-800 text-xs">
+                                <option value="sirius kristali">Sirius Kristali</option>
+                                <option value="dolunay ışığı">Dolunay Işığı Özü</option>
+                                <option value="vitray cam tozu">Antika Vitray Cam Tozu</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button onclick="playChime(); brewPotion()" class="px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest shadow-lg">
+                            İksiri Demle ve Reçete Çıkar 🧪
+                        </button>
+                    </div>
+                    <div id="potion-result" class="p-4 bg-[#faf2e4] rounded-xl border border-amber-900/20 text-center space-y-2 hidden">
+                        <h4 id="pot-title" class="title-font font-bold text-lg text-amber-900">-</h4>
+                        <p id="pot-desc" class="text-xs text-stone-700 italic">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. RÜNİK ÇEVİRİCİ -->
+            <div id="lab-cevirici" class="stained-border p-8 md:p-10 rounded-3xl shadow-xl max-w-4xl mx-auto space-y-6 hidden">
+                <div class="text-center space-y-2">
+                    <h3 class="title-font text-2xl font-bold gold-text">Kadim Peri Dili ve Ogham Çeviricisi</h3>
+                    <p class="text-stone-300 text-sm">Türkçe cümlenizi girin; kadim vitray peri alfabesine veya rünik simgelere dönüştürelim.</p>
+                </div>
+                <div class="parchment-box p-6 rounded-2xl space-y-4">
+                    <div>
+                        <label class="block title-font text-xs font-bold text-amber-900 mb-1">Çevrilecek Metin</label>
+                        <input type="text" id="translate-input" placeholder="Örn: Sonsuz bahar diyarı..." class="w-full px-4 py-2.5 rounded-xl bg-white border border-amber-800 text-stone-800 text-sm">
+                    </div>
+                    <div class="flex justify-center gap-3">
+                        <button onclick="playChime(); translateToFairy()" class="px-6 py-2 bg-amber-900 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest">Peri Dilinde Yaz 🧚‍♀️</button>
+                        <button onclick="playChime(); translateToRunic()" class="px-6 py-2 bg-amber-700 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest">Kadim Rün Çevir 🪨</button>
+                    </div>
+                    <div id="translate-result" class="p-4 bg-[#faf2e4] rounded-xl border border-amber-900/20 text-center space-y-2 hidden">
+                        <h4 class="title-font font-bold text-xs uppercase tracking-widest text-amber-900">Çeviri Sonucu</h4>
+                        <div id="translate-output" class="fairy-script text-xl font-bold text-[#24160c] py-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. PERİ İSMİ ÜRETİCİSİ -->
+            <div id="lab-name" class="stained-border p-8 md:p-10 rounded-3xl shadow-xl max-w-4xl mx-auto space-y-6 hidden">
+                <div class="text-center space-y-2">
+                    <h3 class="title-font text-2xl font-bold gold-text">Kadim Peri İsim Üreteci</h3>
+                    <p class="text-stone-300 text-sm">Vitray ve yıldız tozundan ilham alan kendi peri adınızı keşfedin.</p>
+                </div>
+                <div class="parchment-box p-8 rounded-2xl text-center space-y-4">
+                    <div id="generated-name-display" class="title-font text-2xl md:text-3xl font-extrabold text-[#24160c] tracking-wider">
+                        ✨ [ Adınızı Üretmek İçin Butona Dokunun ] ✨
+                    </div>
+                    <p id="generated-desc" class="text-stone-700 italic text-sm">Ürettiğiniz ismin ormandaki kökeni burada belirecek.</p>
+                    <div class="pt-2">
+                        <button onclick="playChime(); generateFairyName()" class="px-8 py-3 bg-amber-900 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest shadow-lg">
+                            Peri İsmimi Üret 🪄
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. RÜYA YORUMCUSU -->
+            <div id="lab-dream" class="stained-border p-8 md:p-10 rounded-3xl shadow-xl max-w-4xl mx-auto space-y-6 hidden">
+                <div class="text-center space-y-2">
+                    <h3 class="title-font text-2xl font-bold gold-text">Rüya Günlüğü ve Peri Yorumcusu</h3>
+                    <p class="text-stone-300 text-sm">Gördüğünüz rüyayı kısaca yazın, Selene perilerinin rüya sözlüğünden karşılığını okuyun.</p>
+                </div>
+                <div class="parchment-box p-6 rounded-2xl space-y-4">
+                    <div>
+                        <label class="block title-font text-xs font-bold text-amber-900 mb-1">Rüyanızda Ne Gördünüz?</label>
+                        <input type="text" id="dream-input" placeholder="Örn: Ormanda kanatlı bir geyik ve sedef gölet..." class="w-full px-4 py-2.5 rounded-xl bg-white border border-amber-800 text-stone-800 text-sm">
+                    </div>
+                    <div class="text-center">
+                        <button onclick="playChime(); interpretDream()" class="px-8 py-3 bg-amber-900 text-amber-100 rounded-full text-xs title-font font-bold tracking-widest shadow-lg">
+                            Rüyayı Selene Perilerine Yorumlat 🌙
+                        </button>
+                    </div>
+                    <div id="dream-result" class="p-4 bg-[#faf2e4] rounded-xl border border-amber-900/20 text-center space-y-2 hidden">
+                        <h4 id="dream-title" class="title-font font-bold text-lg text-amber-900">-</h4>
+                        <p id="dream-desc" class="text-xs text-stone-700 italic">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. BOTANİK BAHÇE -->
+            <div id="lab-botanik" class="stained-border p-8 md:p-10 rounded-3xl shadow-xl max-w-4xl mx-auto space-y-6 hidden">
+                <div class="text-center space-y-2">
+                    <h3 class="title-font text-2xl font-bold gold-text">Mitolojik Botanik ve Şifalı Otlar</h3>
+                    <p class="text-stone-300 text-sm">Perilerin bahçesindeki şifalı bitkilere dokunarak kadim özelliklerini öğrenin.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div onclick="playChime(); showHerb('Geçit Çiçeği', 'Sadece dolunayda açar, uçma rüyaları getirir.')" class="parchment-card p-5 rounded-2xl cursor-pointer text-center">
+                        <span class="text-3xl block mb-2">🌸</span>
+                        <h4 class="title-font font-bold text-sm text-amber-900">Geçit Çiçeği</h4>
+                        <p class="text-xs text-stone-600 mt-1">Dokun ve İncele</p>
+                    </div>
+                    <div onclick="playChime(); showHerb('Kadim Gümüş Yosun', 'Yaraları iyileştirir, ulu köklerde yetişir.')" class="parchment-card p-5 rounded-2xl cursor-pointer text-center">
+                        <span class="text-3xl block mb-2">🌿</span>
+                        <h4 class="title-font font-bold text-sm text-amber-900">Gümüş Yosun</h4>
+                        <p class="text-xs text-stone-600 mt-1">Dokun ve İncele</p>
+                    </div>
+                    <div onclick="playChime(); showHerb('Yıldız Tozu Eğreltisi', 'Karanlıkta parlar, yol gösterir.')" class="parchment-card p-5 rounded-2xl cursor-pointer text-center">
+                        <span class="text-3xl block mb-2">🍃</span>
+                        <h4 class="title-font font-bold text-sm text-amber-900">Yıldız Eğreltisi</h4>
+                        <p class="text-xs text-stone-600 mt-1">Dokun ve İncele</p>
+                    </div>
+                </div>
+                <div id="herb-result" class="p-4 bg-[#faf2e4] rounded-xl border border-amber-900/20 text-center space-y-2 hidden">
+                    <h4 id="herb-title" class="title-font font-bold text-base text-amber-900">-</h4>
+                    <p id="herb-desc" class="text-xs text-stone-700 italic">-</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAVORİLER BÖLÜMÜ -->
+        <section id="favoriler" class="space-y-6">
+            <div class="border-b border-amber-500/30 pb-4">
+                <h2 class="title-font text-2xl md:text-3xl font-bold gold-text">⭐ Yıldız Tozu Not Defteri (Favorilerim)</h2>
+                <p class="text-stone-400 text-sm">Kartlar üzerinden favorilere eklediğiniz kadim maddeler burada listelenir.</p>
+            </div>
+            <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Favoriler buraya gelecek -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- DETAYLI WIKI MAKALE MODALI -->
+    <div id="wiki-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#030805]/85 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div id="modal-box" class="parchment-box max-w-3xl w-full p-8 md:p-10 rounded-3xl relative transform scale-95 transition-transform duration-300 space-y-6 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeWikiModal()" class="absolute top-4 right-4 text-2xl font-bold text-amber-900 hover:text-red-700 transition-colors">✕</button>
+            
+            <div class="text-center space-y-2 border-b border-amber-800/20 pb-4">
+                <div class="flex justify-center items-center gap-3">
+                    <span id="modal-cat-badge" class="inline-block text-xs uppercase tracking-widest bg-amber-900 text-amber-100 px-3 py-1 rounded-full font-bold">Kategori</span>
+                    <span id="modal-danger-badge" class="inline-block text-xs uppercase tracking-widest bg-emerald-900 text-emerald-100 px-3 py-1 rounded-full font-bold">Tehlike</span>
+                </div>
+                <h3 id="modal-title" class="title-font text-2xl md:text-4xl font-extrabold text-[#24160c]">Başlık</h3>
+                <p id="modal-habitat" class="text-xs italic text-stone-700">Yaşam Alanı: Bilinmiyor</p>
+            </div>
+
+            <!-- Modal Sekme Menüsü -->
+            <div class="flex border-b border-amber-900/20 text-sm font-semibold">
+                <button onclick="switchModalTab('lore')" id="tab-lore-btn" class="px-4 py-2 border-b-2 border-amber-900 text-amber-900">📖 Kadim Lore</button>
+                <button onclick="switchModalTab('rituel')" id="tab-rituel-btn" class="px-4 py-2 border-b-2 border-transparent text-stone-600 hover:text-amber-900">✨ Büyü & Pratik</button>
+            </div>
+
+            <!-- Modal Sekme İçerikleri -->
+            <div id="modal-body-lore" class="text-stone-800 text-base md:text-lg leading-relaxed space-y-4"></div>
+            <div id="modal-body-rituel" class="text-stone-800 text-base md:text-lg leading-relaxed space-y-4 hidden"></div>
+
+            <div class="flex justify-between items-center pt-4 border-t border-amber-800/20">
+                <button id="modal-fav-btn" onclick="toggleModalFavorite()" class="px-4 py-2 bg-stone-200 text-amber-900 rounded-full text-xs font-bold tracking-wider hover:bg-stone-300 transition-colors border border-amber-800/30">
+                    🤍 Favorilere Ekle
+                </button>
+                <button onclick="closeWikiModal()" class="px-6 py-2 bg-amber-900 text-amber-100 rounded-full text-sm font-bold tracking-wider hover:bg-amber-950 transition-colors">
+                    Maddeyi Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-20 border-t border-amber-500/30 bg-[#010302] text-amber-200/80 py-8 text-center text-sm space-y-2 relative z-10">
+        <p class="title-font tracking-widest text-amber-400 font-bold">CODEX AETHERIA • 100+ MADDELİK DEVASA ANTİK PERİ VE YILDIZ ANSİKLOPEDİSİ</p>
+        <p>Bütün telif hakları ormanın kadim ruhlarına, vitray pencerelere ve sonsuz bahara aittir.</p>
+    </footer>
+
+    <!-- JavaScript & Devasa Wiki Mantığı (100+ Madde) -->
+    <script>
+        // --- 1. WEB AUDIO API SES EFEKTLERİ & MÜZİK KUTUSU ---
+        let audioCtx = null;
+        let musicActive = false;
+        let melodyInterval = null;
+
+        function toggleAudio() {
+            musicActive = !musicActive;
+            const btn = document.getElementById('audio-toggle-btn');
+            if (musicActive) {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                btn.innerText = "🎶 Müzik: Açık";
+                btn.className = "px-3 py-1 bg-emerald-900 text-emerald-200 rounded-full text-xs font-bold border border-emerald-500/60 transition-all";
+                startAmbientMelody();
+            } else {
+                btn.innerText = "🎶 Müzik: Kapalı";
+                btn.className = "px-3 py-1 bg-amber-900/60 hover:bg-amber-900 text-amber-200 rounded-full text-xs font-bold border border-amber-500/40 transition-all";
+                stopAmbientMelody();
+            }
+        }
+
+        function playChime() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime); // E5
+                osc.frequency.exponentialRampToValueAtTime(1318.51, audioCtx.currentTime + 0.4); // E6
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.45);
+            } catch(e) {}
+        }
+
+        function startAmbientMelody() {
+            const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+            if (melodyInterval) clearInterval(melodyInterval);
+            melodyInterval = setInterval(() => {
+                if (!musicActive) return;
+                try {
+                    const freq = notes[Math.floor(Math.random() * notes.length)];
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 1.2);
+                } catch(e) {}
+            }, 1800);
+        }
+
+        function stopAmbientMelody() {
+            if (melodyInterval) clearInterval(melodyInterval);
+        }
+
+        // --- 2. TEMA DEĞİŞTİRİCİ ---
+        function setTheme(themeName) {
+            const body = document.getElementById('body-theme');
+            body.className = `theme-${themeName} min-h-screen relative selection:bg-pink-900 selection:text-amber-200`;
+            playChime();
+        }
+
+        // --- 3. CANVAS YILDIZ TOZU ANİMASYONU ---
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 90; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 2.4 + 0.5,
+                color: Math.random() > 0.5 ? '#ffd700' : '#ffc2d1',
+                alpha: Math.random(),
+                speed: Math.random() * 0.35 + 0.1,
+                alphaSpeed: Math.random() * 0.02 + 0.005
+            });
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.y -= p.speed;
+                p.alpha += p.alphaSpeed;
+                if (p.alpha > 1 || p.alpha < 0.1) p.alphaSpeed = -p.alphaSpeed;
+                if (p.y < 0) p.y = height;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.abs(p.alpha);
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = p.color;
+                ctx.fill();
+            });
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+        // --- 4. 100+ DEVASA WIKI VERİ TABANI ---
+        let wikiArticles = [
+            // Kabileler (1-20)
+            { id: "solis", title: "Solis (Güneş Perileri)", category: "kabile", danger: "Zararsız / Şifalı", habitat: "Antik Vitray Camlar", summary: "Şafak vakti antik vitray pencerelerden doğan, altın sarısı kanatlı neşe perileri.", lore: "<p>Antika vitray camların arkasından süzülen altın rengi ışık huzmelerinden varolduklarına inanılır.</p>", rituel: "Şafak vakti bir ayçiçeğinin yaprağına dokunup gülümsersiniz." },
+            { id: "naiad", title: "Naiad (Nilüfer ve Göl Perileri)", category: "kabile", danger: "Düşük", habitat: "Gizli Orman Göletleri", summary: "Gizli orman göletlerinde sedef yansımalarla yaşayan su perileri.", lore: "<p>Suların en berrak noktalarında nilüfer yapraklarının altında barınırlar.</p>", rituel: "Göl kenarına bırakılan gümüş boncuk rüyalarınızı aydınlatır." },
+            { id: "dryad", title: "Dryad (Orman Ağaç Perileri)", category: "kabile", danger: "Orta", habitat: "Kadim Meşeler", summary: "Ulu ağaçların ruhunu taşıyan, doğanın koruyucu muhafızları.", lore: "<p>Yüzlerce yıllık meşe ağaçlarının öz suyundan doğarlar.</p>", rituel: "Ulu bir ağaca sarılıp fısıldamak ruhu dinlendirir." },
+            { id: "selene", title: "Selene (Gece Perileri)", category: "kabile", danger: "Zararsız", habitat: "Gece Çiçeği Bahçeleri", summary: "Yıldız tozundan örülü tüllerle gece düşlerini koruyan ay perileri.", lore: "<p>Gece çiçeklerinin açtığı saatlerde gökyüzünden süzülürler.</p>", rituel: "Yastık altına lavanta koymak Selene'yi çağırır." },
+            { id: "pixie", title: "Pixie (Yaramazlık Perileri)", category: "kabile", danger: "Hafif", habitat: "Kaya Yarıkları", summary: "Gezginleri yoldan çıkaran, altın peşinde koşan neşeli varlıklar.", lore: "<p>Yosun tutmuş kaya yarıklarında kabileler halinde yaşarlar.</p>", rituel: "Cebinize ekmek kırıntısı bırakmak yol gösterir." },
+            { id: "sylph", title: "Sylph (Hava Rüzgar Perileri)", category: "kabile", danger: "Hafif", habitat: "Dağ Zirveleri", summary: "Esintilerle seyahat eden, görünmez rüzgar perileri.", lore: "<p>Bulutların arasından süzülen rüzgar akımlarından var olurlar.</p>", rituel: "Rüzgara karşı dilek tutmak." },
+            { id: "gnome", title: "Gnome (Toprak Maden Koruyucuları)", category: "kabile", danger: "Titiz", habitat: "Mağaralar", summary: "Değerli taşların ve yeraltı kristallerinin bekçileri.", lore: "<p>Toprağın altındaki zenginlikleri korurlar.</p>", rituel: "Mağaraya ekmek bırakmak." },
+            { id: "hamadryad", title: "Hamadryad (Söğüt Perileri)", category: "kabile", danger: "Huzurlu", habitat: "Nehir Söğütleri", summary: "Söğüt dallarının arkasından hüzünlü şarkılar söyleyen periler.", lore: "<p>Söğüt ağaçlarıyla bütünleşmiştir.</p>", rituel: "Söğüt dalına dokunmak." },
+            { id: "lampad", title: "Lampad (Yeraltı Meşale Perileri)", category: "kabile", danger: "Gizemli", habitat: "Karanlık Mağaralar", summary: "Ellerinde sönmeyen kadim meşalelerle mağaraları aydınlatanlar.", lore: "<p>Hades'in bahçelerinde yetişen özel perilerdir.</p>", rituel: "Mum yakmak." },
+            { id: "nereid", title: "Nereid (Deniz Dalga Perileri)", category: "kabile", danger: "Görkemli", habitat: "Mercan Resifleri", summary: "Yunuslarla birlikte okyanuslarda süzülen inci taçlı deniz perileri.", lore: "<p>Okyanus akıntılarında yüzerler.</p>", rituel: "Deniz kabuğu bırakmak." },
+            { id: "autumn-sprite", title: "Sonbahar Yaprak Perileri", category: "kabile", danger: "Zararsız", habitat: "Kızıl Yapraklar", summary: "Ormanı altın sarısına ve kızıla boyayan renk perileri.", lore: "<p>Sonbahar rüzgarlarıyla yaprak boyarlar.</p>", rituel: "Kırmızı yaprak saklamak." },
+            { id: "frost-fairy", title: "Buz ve Kırağı Perileri", category: "kabile", danger: "Hafif Soğuk", habitat: "Kış Pencereleri", summary: "Pencerelerde buzdan dantel desenler çizen kış perileri.", lore: "<p>Kış gecelerinde camlarda kristal açtırırlar.</p>", rituel: "Buz desenine dokunmak." },
+            { id: "spring-sprite", title: "Bahar Çiçek Perileri", category: "kabile", danger: "Zararsız", habitat: "Çiçek Tarlaları", summary: "Papatya ve menekşeleri uyandıran neşeli periler.", lore: "<p>Toprağa ilk nefesi verirler.</p>", rituel: "Çiçek koklamak." },
+            { id: "starlight-fairy", title: "Yıldız Işığı Perileri", category: "kabile", danger: "Zararsız", habitat: "Göksel Tepeler", summary: "Karakuşak yıldızlarından yeryüzüne ışık taşıyanlar.", lore: "<p>Işığı yeryüzüne indirirler.</p>", rituel: "Yıldızlara bakmak." },
+            { id: "shadow-sprite", title: "Gölge Perileri", category: "kabile", danger: "Gizemli", habitat: "Derin Orman Gölgeleri", summary: "Ormanın gizli kuytularını koruyan sessiz varlıklar.", lore: "<p>Gölge oyunlarıyla kamufle olurlar.</p>", rituel: "Sessizce yürümek." },
+            { id: "firefly-fairy", title: "Ateşböceği Perileri", category: "kabile", danger: "Zararsız", habitat: "Akşam Çayırları", summary: "Akşamları fener yakarak yol gösteren minik periler.", lore: "<p>Işıklarını ritmik yakarlar.</p>", rituel: "Ateşböceğini izlemek." },
+            { id: "crystal-fairy", title: "Kristal Mağara Perileri", category: "kabile", danger: "Zararsız", habitat: "Kuvars Damarları", summary: "Kuvars ve ametist mağaralarında parlayan ışıltılı periler.", lore: "<p>Kristal titreşimleriyle yaşarlar.</p>", rituel: "Kristal tutmak." },
+            { id: "cloud-sprite", title: "Bulut Perileri", category: "kabile", danger: "Zararsız", habitat: "Yüksek Bulutlar", summary: "Pamuk bulutlar üstünde uyuyan gökyüzü perileri.", lore: "<p>Yağmur damlalarını şekillendirirler.</p>", rituel: "Gökyüzüne bakmak." },
+            { id: "moss-pixie", title: "Yosun Pixieleri", category: "kabile", danger: "Hafif", habitat: "Kütük Üstleri", summary: "Yosun kaplı kütüklerde yaşayan şakacı minikler.", lore: "<p>Gezginlerin patikasını değiştirirler.</p>", rituel: "Yosuna basmamak." },
+            { id: "amber-fairy", title: "Kehribar Perileri", category: "kabile", danger: "Zararsız", habitat: "Reçine Ormanları", summary: "Çam reçinelerinden doğan altın sarısı periler.", lore: "<p>Ağacın gözyaşını korurlar.</p>", rituel: "Kehribar taşımak." },
+
+            // Yıldızlar (21-40)
+            { id: "pleiades", title: "Pleiades (Yedi Kızkardeş)", category: "yildiz", danger: "Kutsal Işık", habitat: "Kuzey Gökyüzü", summary: "Mitolojide gökyüzüne yükselmiş peri kraliçelerinin yıldız kümesi.", lore: "<p>Yeryüzündeki göletlere ışık yansıtarak perilerin dansına eşlik ederler.</p>", rituel: "Pleiades tepeye ulaştığında dilek tutmak." },
+            { id: "sirius", title: "Sirius (Köpek Yıldızı)", category: "yildiz", danger: "Yüksek Enerji", habitat: "Yıldız Geçitleri", summary: "Yaz sıcaklarını getiren ve boyutlar arası geçitleri açan mavi-beyaz yıldız.", lore: "<p>Peri krallığında yaz festivalini müjdeler.</p>", rituel: "Sirius gecesi açık havada uyumak." },
+            { id: "cassiopeia", title: "Kraliçe Cassiopeia", category: "yildiz", danger: "Zararsız", habitat: "W Tahtı", summary: "Gökyüzündeki tahtında oturan peri kraliçelerinin meclis mührü.", lore: "<p>W harfi şeklindeki takımyıldızıdır.</p>", rituel: "Cassiopeia'ya bakarak antlaşma yapmak." },
+            { id: "north-star", title: "Kutup Yıldızı (Polaris)", category: "yildiz", danger: "Zararsız", habitat: "Göksel Eksen", summary: "Ormanda yolunu kaybeden gezginlerin rehber yıldızı.", lore: "<p>Hiç yer değiştirmeyen sabit yıldız.</p>", rituel: "Kutup Yıldızı'na bakarak dilek dilemek." },
+            { id: "milky-way", title: "Samanyolu (Gümüş Peri Yolu)", category: "yildiz", danger: "Zararsız", habitat: "Göksel Nehir", summary: "Perilerin yıldız tozundan süpürerek oluşturduğu ışıltılı nehir.", lore: "<p>Galaksiler arası seyahat yolu.</p>", rituel: "Samanyolu altında yürümek." },
+            { id: "vega", title: "Vega (Mavi Dokumacı Yıldız)", category: "yildiz", danger: "Zararsız", habitat: "Çalgı Takımyıldızı", summary: "Yıldız tozundan tüller dokuyan göksel perilerin yıldızı.", lore: "<p>Ay perileri buradan cüppe diker.</p>", rituel: "Vega ışığında iğne ipliğe dokunmak." },
+            { id: "arcturus", title: "Arcturus (Kehribar Dev)", category: "yildiz", danger: "Zararsız", habitat: "Çoban Takımyıldızı", summary: "Orman perilerinin gece nöbetlerinde yön bulmasını sağlayan yıldız.", lore: "<p>Kehribar rengi dev yıldız.</p>", rituel: "Arcturus ışığı altında niyet etmek." },
+            { id: "betelgeuse", title: "Betelgeuse (Kızıl Dev)", category: "yildiz", danger: "Yüksek", habitat: "Orion Omuzu", summary: "Gökyüzünün kızıl dev omuz yıldızı, ateş perilerinin koruyucusu.", lore: "<p>Ateş perilerinin odak noktası.</p>", rituel: "Kızıl ışık altında cesaret tazelemek." },
+            { id: "rigel", title: "Rigel (Mavi Süperdev)", category: "yildiz", danger: "Zararsız", habitat: "Orion Ayağı", summary: "Buz ve su perilerinin gökyüzündeki kristal yansıması.", lore: "<p>Naiadların göllere mavi ışık yansıttığı an.</p>", rituel: "Rigel parıltısı altında su içmek." },
+            { id: "antares", title: "Antares (Akrep Kalbi)", category: "yildiz", danger: "Gizemli", habitat: "Akrep Takımyıldızı", summary: "Yeraltı perilerinin pusulası olan kadim kızıl yıldız.", lore: "<p>Gnome kabileleri buna göre kazı yapar.</p>", rituel: "Doğru zamanlama takibi." },
+            { id: "cygnus", title: "Cygnus (Göksel Kuğu)", category: "yildiz", danger: "Zararsız", habitat: "Samanyolu Kanatları", summary: "Kuğu formundaki peri seyahat rehberi.", lore: "<p>Su perilerinin sevdiği durak.</p>", rituel: "Kuğu yıldızına bakmak." },
+            { id: "lyra", title: "Lyra (Şarkı Yıldızı)", category: "yildiz", danger: "Zararsız", habitat: "Kuzey Göğü", summary: "Perilerin müzik ilhamını aldığı kadim çalgı takımyıldızı.", lore: "<p>Kutsal melodilerin kaynağı.</p>", rituel: "Enstrüman çalmak." },
+            { id: "sirius-b", title: "Sirius B (Beyaz Cüce)", category: "yildiz", danger: "Derin", habitat: "Sirius Çevresi", summary: "Gözle görülmeyen ama güçlü enerji yayan kadim yoldaş yıldız.", lore: "<p>Gizli bilgeliğin kapısı.</p>", rituel: "Gözleri kapatıp hissetmek." },
+            { id: "polaris", title: "Polaris Minor", category: "yildiz", danger: "Zararsız", habitat: "Küçük Ayı", summary: "Kutup yıldızının sadık yoldaşı.", lore: "<p>Geceyi bekleyen minik ışık.</p>", rituel: "Sabit kalmak." },
+            { id: "aldebaran", title: "Aldebaran (Kızıl Göz)", category: "yildiz", danger: "Orta", habitat: "Boğa Gözü", summary: "Boğa takımyıldızının parlayan turuncu gözü.", lore: "<p>Cesaret perilerinin sembolü.</p>", rituel: "Kararlı adımlar atmak." },
+            { id: "spica", title: "Spica (Başak Başak Yıldızı)", category: "yildiz", danger: "Zararsız", habitat: "Başak Takımyıldızı", summary: "Bereket ve hasat perilerinin gökyüzündeki simgesi.", lore: "<p>Toprak verimliliğini yönetir.</p>", rituel: "Hasat şükrü." },
+            { id: "antares-prime", title: "Antares Nova", category: "yildiz", danger: "Nadir", habitat: "Akrep Derinliği", summary: "Yüzyılda bir parlayan kozmik ışık patlaması.", lore: "<p>Dönüşüm enerjisi.</p>", rituel: "Yepyeni bir sayfa açmak." },
+            { id: "capella", title: "Capella (Keçi Yıldızı)", category: "yildiz", danger: "Zararsız", habitat: "Arabacı Takımyıldızı", summary: "Dağ perilerinin tırmanışlarında rehberlik eden sarı dev.", lore: "<p>Yüksek zirve yıldızı.</p>", rituel: "Zirveye odaklanmak." },
+            { id: "procyon", title: "Procyon (Öncü Köpek)", category: "yildiz", danger: "Zararsız", habitat: "Küçük Köpek", summary: "Sirius'tan hemen önce doğan öncü parlak yıldız.", lore: "<p>Haberci yıldız.</p>", rituel: "Hazırlık yapmak." },
+            { id: "altair", title: "Altair (Kartalın Gözü)", category: "yildiz", danger: "Zararsız", habitat: "Kartal Takımyıldızı", summary: "Gökyüzünde süzülen kartalın parlak merkezi.", lore: "<p>Uzak görüşlülük kazandırır.</p>", rituel: "Ufka bakmak." },
+
+            // Takvimler (41-55)
+            { id: "beltane", title: "Beltane Bahar Şenliği", category: "takvim", danger: "Kutlama", habitat: "Ateş Çemberleri", summary: "Kışın bittiğini ve perilerin yeryüzüne indiğini müjdeleyen büyük bayram.", lore: "<p>Perilerle insan dünyasının en çok yaklaştığı zaman.</p>", rituel: "Şafakta çiğ suyuyla yüzü yıkamak." },
+            { id: "samhain", title: "Samhain Perde İncelmesi", category: "takvim", danger: "Dikkat", habitat: "Geçitler", summary: "Dünya ile peri alemi arasındaki perdenin kalktığı sonbahar dönümü.", lore: "<p>Ruhların serbest dolaştığı gece.</p>", rituel: "Pencerelere süt bırakmak." },
+            { id: "solstice", title: "Gündönümü Dengesi", category: "takvim", danger: "Zararsız", habitat: "Taş Çemberleri", summary: "Yılın en uzun gününde gerçekleşen kadim kozmik denge.", lore: "<p>Güneş ve ay perilerinin taht devir teslimi.</p>", rituel: "Meşe ateşi yakmak." },
+            { id: "imbolc", title: "Imbolc Işık Şenliği", category: "takvim", danger: "Zararsız", habitat: "Ocak Başları", summary: "Kışın kırılma noktasında baharın ilk kıvılcımı.", lore: "<p>Topraktaki tohumların uyanışı.</p>", rituel: "Mum dikmek." },
+            { id: "lammas", title: "Lammas Hasat Dönemi", category: "takvim", danger: "Zararsız", habitat: "Buğday Tarlaları", summary: "İlk hasadın toplandığı, toprak perilerine şükran dönemi.", lore: "<p>Bereketin zirvesi.</p>", rituel: "Buğday figürü örmek." },
+            { id: "equinox", title: "Ekinoks Eşitliği", category: "takvim", danger: "Zararsız", habitat: "Denge Sütunları", summary: "Işık ile karanlığın kusursuz uyumla kucaklaşması.", lore: "<p>Doğanın dengesini koruma ayini.</p>", rituel: "Meditasyon yapmak." },
+            { id: "yule", title: "Yule Kış Gündönümü", category: "takvim", danger: "Zararsız", habitat: "Kar Ormanları", summary: "Güneşin yeniden doğuşunu kutlayan peri bayramı.", lore: "<p>Kristal saraylarda şölenler.</p>", rituel: "Çam dalı koymak." },
+            { id: "mabon", title: "Mabon Sonbahar Şükran", category: "takvim", danger: "Zararsız", habitat: "Elma Bahçeleri", summary: "Yazın hediyelerine teşekkür edilen sonbahar döngüsü.", lore: "<p>Kış uykusu hazırlığı.</p>", rituel: "Elma paylaşmak." },
+            { id: "flower-moon", title: "Çiçek Ayı Döngüsü", category: "takvim", danger: "Zararsız", habitat: "Çiçek Vadileri", summary: "Baharın tüm renklerinin patlama yaptığı takvim.", lore: "<p>Bal şölenleri dönemi.</p>", rituel: "Çiçek çayı içmek." },
+            { id: "harvest-moon", title: "Hasat Dolunayı", category: "takvim", danger: "Zararsız", habitat: "Mehtaplı Tarlalar", summary: "Geceleri ışık veren devasa hasat dolunayı döngüsü.", lore: "<p>Ay perilerinin tarlalarda yardımı.</p>", rituel: "Niyet defteri yazmak." },
+            { id: "sturn-cycle", title: "Sturn Döngüsü", category: "takvim", danger: "Zararsız", habitat: "Zaman Kulesi", summary: "Yıldız saatlerinin sıfırlandığı 13 aylık kadim takvim.", lore: "<p>Zamanın döngüsel akışı.</p>", rituel: "Saati ayarlamak." },
+            { id: "nova-phase", title: "Nova Evresi", category: "takvim", danger: "Nadir", habitat: "Kozmik Merkez", summary: "Yeni yıldız doğumlarının kutlandığı özel gök takvimi.", lore: "<p>Yaratılış enerjisi.</p>", rituel: "Yeni fikirler üretmek." },
+            { id: "frost-month", title: "Kırağı Ayı", category: "takvim", danger: "Soğuk", habitat: "Buz Vadileri", summary: "İlk donların düştüğü kış başlangıç takvimi.", lore: "<p>Doğanın dinlenme evresi.</p>", rituel: "Sıcak içecekler içmek." },
+            { id: "amber-season", title: "Kehribar Mevsimi", category: "takvim", danger: "Zararsız", habitat: "Çam Ormanları", summary: "Reçinelerin olgunlaştığı sıcak yaz sonu dönemi.", lore: "<p>Altın sarısı günler.</p>", rituel: "Doğada yürümek." },
+            { id: "dawn-era", title: "Şafak Çağı", category: "takvim", danger: "Zararsız", habitat: "Ufuk Çizgisi", summary: "Her günün ilk saatindeki kutsal zaman dilimi.", lore: "<p>Tüm büyünün yenilendiği an.</p>", rituel: "Güneşi selamlamak." },
+
+            // Göksel Olaylar (56-70)
+            { id: "meteor-shower", title: "Perseid Yıldız Kayması", category: "olay", danger: "Zararsız", habitat: "Yıldızlı Gökyüzü", summary: "Gökyüzünden düşen binlerce parıltılı meteorun dilek taşıması.", lore: "<p>Yıldız tozunun dünyaya yaklaştığı gece.</p>", rituel: "Yıldız kayarken dilek dilemek." },
+            { id: "blood-moon", title: "Kanlı Ay Tutulması", category: "olay", danger: "Yoğun", habitat: "Göletler", summary: "Ayın sedef pembesi ve kızıl tonlara büründüğü geçit gecesi.", lore: "<p>Perilerin gücünün doruğa çıktığı an.</p>", rituel: "Su kasesine bakarak vizyon aramak." },
+            { id: "aurora", title: "Kuzey Işıkları (Aurora)", category: "olay", danger: "Zararsız", habitat: "Kutup Göğü", summary: "Gökyüzünde dans eden yeşil ve pembe peri ışığı dalgaları.", lore: "<p>Sylph ve Selene perilerinin dansı.</p>", rituel: "Aurora altında niyet etmek." },
+            { id: "sol-eclipse", title: "Güneş Tutulması Kapısı", category: "olay", danger: "Yüksek", habitat: "Antika Tapınaklar", summary: "Güneş ile ayın birleştiği, zamanın durduğu an.", lore: "<p>Güneş ve ay perilerinin kucaklaşması.</p>", rituel: "Sessizlik içinde meditasyon." },
+            { id: "nebula-dust", title: "Bulutsu Toz Fırtınası", category: "olay", danger: "Zararsız", habitat: "Derin Uzay", summary: "Pembe ve altın renkli bulutsuların dünyaya toz yayması.", lore: "<p>Orman yapraklarını parlatır.</p>", rituel: "Takıları yıldız enerjisiyle yüklemek." },
+            { id: "comet-pass", title: "Kuyruklu Yıldız Geçişi", category: "olay", danger: "Görkemli", habitat: "Göksel Rota", summary: "Yüzyılda bir görünen peri çağını başlatan yıldız.", lore: "<p>Diyar sınırlarını genişletir.</p>", rituel: "Dilek feneri uçurmak." },
+            { id: "stellar-alignment", title: "Beşli Yıldız Hizalanması", category: "olay", danger: "Yüksek Büyü", habitat: "Kozmik Zirve", summary: "Beş büyük yıldızın kusursuz çember oluşturması.", lore: "<p>En güçlü kadim büyülerin yapıldığı an.</p>", rituel: "Çember altında niyet mühürlemek." },
+            { id: "zenith-glow", title: "Zirve Parıltısı", category: "olay", danger: "Zararsız", habitat: "Dağ Tepeleri", summary: "Şafaktan hemen önce gökyüzünün pembeye boyanması.", lore: "<p>Solis perilerinin şafak çemberi.</p>", rituel: "Derin nefesle aurası temizlemek." },
+            { id: "stardust-rain", title: "Gümüş Yağmur Damlaları", category: "olay", danger: "Zararsız", habitat: "Gizli Ormanlar", summary: "Yıldız tozunun hafif yağmurla yeryüzüne süzülmesi.", lore: "<p>Toprağın gümüş parıltıyla kaplanması.</p>", rituel: "Yağmur suyu toplamak." },
+            { id: "crystal-fog", title: "Kristal Peri Sisi", category: "olay", danger: "Zararsız", habitat: "Göl Kenarları", summary: "Vadiyi kaplayan sedef renkli yoğun sis perdesi.", lore: "<p>Görünmezlik perilerinin buhar bulutu.</p>", rituel: "Siste sır fısıldamak." },
+            { id: "solar-flare", title: "Kozmik Güneş Püskürmesi", category: "olay", danger: "Enerjik", habitat: "Güneş Tacı", summary: "Güneşten yayılan altın tozlu sıcak dalga.", lore: "<p>Solis enerjisinin patlaması.</p>", rituel: "Enerji tazelemek." },
+            { id: "lunar-halo", title: "Ay Halesi Çemberi", category: "olay", danger: "Zararsız", habitat: "Mehtaplı Gökyüzü", summary: "Dolunay etrafında oluşan dev gümüş çember.", lore: "<p>Ay perilerinin koruma kalkanı.</p>", rituel: "Çember içinde dua etmek." },
+            { id: "nova-flash", title: "Nova Işıltısı", category: "olay", danger: "Nadir", habitat: "Uzak Galaksi", summary: "Yeni doğan yıldızın evrene yaydığı ilk parıltı.", lore: "<p>Mucizevi doğum anı.</p>", rituel: "Yeni başlangıç yapmak." },
+            { id: "meteor-dust", title: "Kayan Yıldız Tozu", category: "olay", danger: "Zararsız", habitat: "Yeryüzü", summary: "Düşen meteorların toprağa bıraktığı parlak madenler.", lore: "<p>Yıldız hediyeleri.</p>", rituel: "Toprakla bağ kurmak." },
+            { id: "cosmic-wind", title: "Kozmik Rüzgar Fırtınası", category: "olay", danger: "Hafif", habitat: "Boyut Sınırı", summary: "Boyutlar arası geçitleri titreştiren yumuşak dalga.", lore: "<p>Sylphlerin geçiş rüzgarı.</p>", rituel: "Rüzgara kulak vermek." },
+
+            // Büyülü Bitkiler (71-85)
+            { id: "moonflower", title: "Geçit Çiçeği (Moonflower)", category: "bitki", danger: "Zararsız", habitat: "Ay Işığı Patikaları", summary: "Sadece dolunayda açan ve sedef pembe parlayan büyü çiçeği.", lore: "<p>Ay ışığını gördüğü an devasa açılır.</p>", rituel: "Uçma rüyaları getirir." },
+            { id: "fairy-moss", title: "Kadim Gümüş Yosun", category: "bitki", danger: "Şifalı", habitat: "Nemli Kayalar", summary: "Dokunulduğunda hafifçe parlayan, yaraları iyileştiren bitki.", lore: "<p>Ormanın en eski köklerinde yetişir.</p>", rituel: "Yaraya koymak." },
+            { id: "starlight-fern", title: "Yıldız Tozu Eğrelti Otu", category: "bitki", danger: "Zararsız", habitat: "Yıldız Açıklıkları", summary: "Yaprak uçlarında minik ışık taneleri taşıyan efsanevi ot.", lore: "<p>Geceleri kendi başına parlar.</p>", rituel: "Cebinde taşımak." },
+            { id: "sun-rose", title: "Altın Güneş Gülü", category: "bitki", danger: "Zararsız", habitat: "Tepe Yamaçları", summary: "Güneş ışığını hapsedip yapraklarında saklayan altın gül.", lore: "<p>Solis perilerinin gözdesi.</p>", rituel: "Evde saklamak." },
+            { id: "dream-petal", title: "Rüya Yaprağı Menekşesi", category: "bitki", danger: "Zararsız", habitat: "Gizli Vadiler", summary: "Tatlı rüyalar getiren, mor ve sedef tonlarında kadife çiçek.", lore: "<p>Selene bahçelerinin huzur bitkisi.</p>", rituel: "Yastık altında saklamak." },
+            { id: "crystal-vine", title: "Kristal Sarmaşık", category: "bitki", danger: "Zararsız", habitat: "Vitray Duvarları", summary: "Cam gibi sert ama esnek, parlayan kristal sarmaşık.", lore: "<p>Binalara koruyucu kalkan örer.</p>", rituel: "Pencereye sarmak." },
+            { id: "stardust-bloom", title: "Yıldız Çiçeği", category: "bitki", danger: "Zararsız", habitat: "Zirve Çayırları", summary: "Taç yapraklarında gerçek yıldız tozu barındıran nadir çiçek.", lore: "<p>Yıldızlarla konuşan dağ çiçeği.</p>", rituel: "Çayını içmek." },
+            { id: "whispering-reed", title: "Fısıldayan Sazlık", category: "bitki", danger: "Zararsız", habitat: "Nehir Kıyıları", summary: "Rüzgar estikçe kadim peri şarkıları mırıldanan sazlıklar.", lore: "<p>Naiadların haberleşme bitkisi.</p>", rituel: "Rüzgarı dinlemek." },
+            { id: "golden-lotus", title: "Gölge Kapan Altın Nilüfer", category: "bitki", danger: "Gizemli", habitat: "Bataklık Göletleri", summary: "Sadece geceleri parlayan ve su altı sırlarını koruyan nilüfer.", lore: "<p>Su altı hazinelerini saklar.</p>", rituel: "Rüya bağlantısı." },
+            { id: "silver-thorn", title: "Gümüş Dikenli Gül", category: "bitki", danger: "Koruyucu", habitat: "Peri Sınırları", summary: "Kötü niyetli varlıkları uzaklaştıran gümüş dikenli çalı.", lore: "<p>Doğal çit görevi görür.</p>", rituel: "Saf niyetle yaklaşmak." },
+            { id: "star-lily", title: "Yıldız Zambağı", category: "bitki", danger: "Zararsız", habitat: "Göl Kenarları", summary: "Yapraklarında yıldız yansıması taşıyan beyaz zambak.", lore: "<p>Saf peri enerjisini çeker.</p>", rituel: "Suya koymak." },
+            { id: "moon-orchid", title: "Ay Orkidesi", category: "bitki", danger: "Zararsız", habitat: "Karanlık Dallar", summary: "Geceleri parlayan nadir mor orkide.", lore: "<p>Gizli bahçelerin incisi.</p>", rituel: "Kokusunu içe çekmek." },
+            { id: "sun-fern", title: "Altın Eğrelti", category: "bitki", danger: "Zararsız", habitat: "Güneş Alan Kaya", summary: "Güneş enerjisi depolayan parlak yapraklı eğrelti.", lore: "<p>Canlılık verir.</p>", rituel: "Dokunup ısınmak." },
+            { id: "crystal-moss", title: "Kristal Yosun", category: "bitki", danger: "Zararsız", habitat: "Mağara Tabanı", summary: "Üzerine basıldığında çınlama sesi çıkaran yosun halısı.", lore: "<p>Mağara perilerinin halısı.</p>", rituel: "Üstünde yürümek." },
+            { id: "amber-vine", title: "Kehribar Sarmaşık", category: "bitki", danger: "Zararsız", habitat: "Çam Gövdeleri", summary: "Sarı reçine damlatan şifalı sarmaşık.", lore: "<p>Ağacı sarıp sarmalar.</p>", rituel: "Reçine toplamak." },
+
+            // Kadim Eserler (86-95)
+            { id: "silver-dew", title: "Gümüş Çiy İksiri", category: "artifact", danger: "Zararsız", habitat: "Şafak Yaprakları", summary: "Şafak vakti toplanan şifalı peri suyu.", lore: "<p>Göz yorgunluğunu alan kadim iksir.</p>", rituel: "Gümüş kaşıkla toplamak." },
+            { id: "starlight-loom", title: "Yıldız Tozu Dokuma Tezgahı", category: "artifact", danger: "Zararsız", habitat: "Ay Mağaraları", summary: "Ay perilerinin gece tüllerini dokuduğu efsanevi tezgah.", lore: "<p>Yıldız parçacıklarını ipliğe çevirir.</p>", rituel: "Tül dokumak." },
+            { id: "crystal-harp", title: "Kristal Nilüfer Arpı", category: "artifact", danger: "Zararsız", habitat: "Göl Sarayları", summary: "Naiadların su altı melodilerini çalmakta kullandığı şeffaf enstrüman.", lore: "<p>Saf kalpliler dokununca ses çıkarır.</p>", rituel: "Dalgaları dinlemek." },
+            { id: "amber-sun", title: "Antika Vitray Güneşi", category: "artifact", danger: "Zararsız", habitat: "Geçit Kapıları", summary: "Sonsuz bahar diyarının kapılarını aralayan kadim vitray motifli güneş.", lore: "<p>Gün batımı ışığını hapseder.</p>", rituel: "Vitray altında niyet etmek." },
+            { id: "fairy-mirror", title: "Sedef Peri Aynası", category: "artifact", danger: "Zararsız", habitat: "Kraliyet Odaları", summary: "Görünenin ötesindeki gerçek ruhu gösteren sedef ayna.", lore: "<p>İçinizdeki peri ışığının rengini gösterir.</p>", rituel: "Aynaya bakıp nefes almak." },
+            { id: "stardust-hourglass", title: "Yıldız Tozu Kum Saati", category: "artifact", danger: "Zararsız", habitat: "Zaman Kulesi", summary: "Akarken kum yerine parlayan yıldız taneleri düşen saat.", lore: "<p>Zamanı yavaşlatır.</p>", rituel: "Saati çevirip dilemek." },
+            { id: "golden-compass", title: "Altın Göksel Pusula", category: "artifact", danger: "Zararsız", habitat: "Kraliyet Arşivi", summary: "En yakın peri geçidini gösteren kadim pusula.", lore: "<p>Yıldız ışığıyla yön gösterir.</p>", rituel: "Kalbin üstünde tutmak." },
+            { id: "moonstone-chalice", title: "Aytaşı Kutsal Kase", category: "artifact", danger: "Zararsız", habitat: "Ay Sunağı", summary: "Dolunay ışığında su doldurulduğunda parlayan kase.", lore: "<p>Ay perilerinin kutsal kasesi.</p>", rituel: "Su içip huzur bulmak." },
+            { id: "crystal-wand", title: "Sedef Saplı Yıldız Asası", category: "artifact", danger: "Zararsız", habitat: "Taş Oda", summary: "Uç kısmında meteor taşı barındıran kadim büyü asası.", lore: "<p>Kraliçelerin tören nesnesi.</p>", rituel: "Daire çizip enerji dağıtmak." },
+            { id: "aetheria-codex", title: "Codex Aetheria Baş Cildi", category: "artifact", danger: "Zararsız", habitat: "Büyük Kütüphane", summary: "Tüm peri tarihini ve yıldız haritalarını barındıran dev cilt.", lore: "<p>Lavanta ve yıldız tozu kokan yaşayan kitap.</p>", rituel: "Kapağa dokunmak." },
+
+            // Peri Şarkıları (96-105)
+            { id: "song-of-solstice", title: "Gündönümü Şafak İlahisi", category: "muzik", danger: "Zararsız", habitat: "Taş Çemberler", summary: "Solis perilerinin en uzun günde söylediği neşe ve bolluk ezgisi.", lore: "<p>Doğanın uyanışını kutlayan melodi.</p>", rituel: "İlahiyi mırıldanmak." },
+            { id: "lullaby-of-selene", title: "Selene'nin Ay Işığı Ninnisi", category: "muzik", danger: "Zararsız", habitat: "Gece Ormanları", summary: "Bebek perileri ve orman canlılarını uyutan yumuşak gece ezgisi.", lore: "<p>Rüzgarın yapraklardan çıkardığı nota.</p>", rituel: "Uykusuz gecelerde dinlemek." },
+            { id: "naiad-stream-song", title: "Naiad Akarsu Şarkısı", category: "muzik", danger: "Zararsız", habitat: "Şelaleler", summary: "Su damlalarının akış ritmiyle senkronize olan su melodisi.", lore: "<p>Akıcı ve huzur verici ses dalgası.</p>", rituel: "Su yanında dinlemek." },
+            { id: "pixie-dance-tune", title: "Pixie Neşe Ezgisi", category: "muzik", danger: "Neşeli", habitat: "Papatyalar", summary: "Hızlı tempolu, insanı dans ettiren neşeli flüt ezgisi.", lore: "<p>Şenliklerin eğlenceli havası.</p>", rituel: "Hızlı tempoda yürümek." },
+            { id: "dryad-root-chant", title: "Dryad Kök Ritmi", category: "muzik", danger: "Zararsız", habitat: "Meşe Kökleri", summary: "Toprağın derinliklerinden gelen tok kadim çan ritmi.", lore: "<p>Ormanın kökleriyle bağ kurma ilahisi.</p>", rituel: "Toprağa basarak dinlemek." },
+            { id: "stardust-chorus", title: "Yıldız Tozu Korosu", category: "muzik", danger: "Zararsız", habitat: "Göksel Zirveler", summary: "Yıldızların ve perilerin ortak yarattığı evrensel yankılı melodi.", lore: "<p>Evrenin büyük uyumu.</p>", rituel: "Gözleri kapatıp hayal etmek." },
+            { id: "moonflower-melody", title: "Moonflower Gece Ezgisi", category: "muzik", danger: "Zararsız", habitat: "Ay Bahçesi", summary: "Çiçekler açarken yayılan tınılar.", lore: "<p>Gece çiçeklerinin sesi.</p>", rituel: "Gözleri kapatıp dinlemek." },
+            { id: "aurora-hum", title: "Aurora Fısıltısı", category: "muzik", danger: "Zararsız", habitat: "Kutup Göğü", summary: "Kuzey ışıklarının gökyüzünde çıkardığı kadife ses.", lore: "<p>Işığın ses dalgası.</p>", rituel: "Huzur bulmak." },
+            { id: "crystal-chime", title: "Kristal Mağara Çanı", category: "muzik", danger: "Zararsız", habitat: "Kuvars Mağara", summary: "Rüzgar mağaradan geçerken çalan kristal tonlar.", lore: "<p>Doğal akordeon ezgisi.</p>", rituel: "Derin nefes almak." },
+            { id: "spring-awakening", title: "Bahar Uyanış Senfonisi", category: "muzik", danger: "Zararsız", habitat: "Çayırlar", summary: "Kıştan çıkan doğanın ilk nefes melodisi.", lore: "<p>Yaşamın neşesi.</p>", rituel: "Gülücük saçmak." }
+        ];
+
+        let currentFilter = 'hepsi';
+        let searchQuery = '';
+        let currentModalArticle = null;
+        let favoriteIds = JSON.parse(localStorage.getItem('peri_favs_v100') || '[]');
+
+        // --- 5. PERİ BURCU VE DOĞUM HARİTASI ---
+        function calculateFairyZodiac() {
+            const day = parseInt(document.getElementById('birth-day').value);
+            const month = parseInt(document.getElementById('birth-month').value);
+
+            const zodiacs = [
+                { range: [1, 1, 19, 1], name: "Kış Kristali Perisi", zodiac: "Buz ve Kırağı Kulesi", desc: "Sakin, derin düşünen, zihinsel berraklığı yüksek ve içsel gücü azametli bir ruha sahipsiniz." },
+                { range: [20, 1, 18, 2], name: "Ay Işığı Muhafızı", zodiac: "Selene Gece Bahçesi", desc: "Sezgileri güçlü, rüya alemiyle bağı sıkı ve gizemli bir aura taşıyan peri burcundasınız." },
+                { range: [19, 2, 20, 3], name: "Nilüfer Su Perisi (Naiad)", zodiac: "Göl Sarayları", desc: "Akışkan, duygusal derinliği olan, sanatçı ruhlu ve huzur yayan bir enerjiye sahipsiniz." },
+                { range: [21, 3, 19, 4], name: "Uyanış Bahar Elçisi", zodiac: "Beltane Şafağı", desc: "Coşkulu, yeni başlangıçlara öncülük eden, etrafına neşe ve hayat enerjisi saçan bir yapınız var." },
+                { range: [20, 4, 20, 5], name: "Güneş Çiçeği Perisi (Solis)", zodiac: "Vitray Pencereler", desc: "Sıcakkanlı, lider ruhlu, altın kalpli ve çevresine ışık olan bir doğanız bulunmaktadır." },
+                { range: [21, 5, 20, 6], name: "Orman ve Meşe Koruyucusu (Dryad)", zodiac: "Kadim Meşe Kökleri", desc: "Doğaya bağlı, adaletli, koruyucu ve köklü bir bilgelik barındıran burçtasınız." },
+                { range: [21, 6, 22, 7], name: "Gündönümü Şarkıcısı", zodiac: "Taş Çemberler", desc: "Işık ve karanlığın dengesini iyi kuran, neşeli, sosyal ve ilham dolu bir ruha sahipsiniz." },
+                { range: [23, 7, 22, 8], name: "Ateş Gözlü Muhafız", zodiac: "Sirius Geçidi", desc: "Cesur, tutkulu, kararlı ve girdiği her ortamda dikkat çeken güçlü bir auranız var." },
+                { range: [23, 8, 22, 9], name: "Hasat ve Bereket Perisi", zodiac: "Altın Tarlalar", desc: "Üretken, yardımsever, detaycı ve bolluk getiren bereketli bir enerji taşıyorsunuz." },
+                { range: [23, 9, 22, 10], name: "Ekinoks Denge Perisi", zodiac: "Denge Sütunları", desc: "Zarif, uyumlu, estetik anlayışı yüksek ve barışçıl bir karaktere sahipsiniz." },
+                { range: [23, 10, 21, 11], name: "Geçit ve Perde Bekçisi", zodiac: "Samanyolu Yolu", desc: "Derin sezgili, mistik konulara meraklı, sırları koruyan ve çözen bir yapıdasınız." },
+                { range: [22, 11, 21, 12], name: "Yıldız Tozu Dokuyucusu", zodiac: "Pleiades Kümesi", desc: "Hayal gücü sonsuz, vizyoner, yaratıcı ve evrensel sevgiyle dolu bir peri ruhusunuz." },
+                { range: [22, 12, 31, 12], name: "Yule Kış Gündönümü Perisi", zodiac: "Kristal Saraylar", desc: "Karanlığı aydınlatan, umut aşılayan, sabırlı ve bilge bir ruh taşıyorsunuz." }
+            ];
+
+            let matched = zodiacs[0];
+            for(let z of zodiacs) {
+                let [sD, sM, eD, eM] = z.range;
+                if ((month === sM && day >= sD) || (month === eM && day <= eD)) {
+                    matched = z;
+                    break;
+                }
+            }
+
+            const resDiv = document.getElementById('zodiac-result');
+            document.getElementById('zodiac-title').innerText = `✨ ${matched.name} (${matched.zodiac}) ✨`;
+            document.getElementById('zodiac-desc').innerText = matched.desc;
+            resDiv.classList.remove('hidden');
+        }
+
+        // --- 6. İNTERAKTİF PERİ ÇARKI ---
+        const wheelOptions = [
+            { title: "Solis Güneş Perisi Koruması", desc: "Bugün gün boyunca yüksek enerji ve neşe seninle olacak. Yeni projelere başlamak için harika bir gün." },
+            { title: "Selene Ay Işığı Rehberliği", desc: "Sezgilerin zirvede. İç sesini dinle, rüyalarında önemli işaretler alacaksın." },
+            { title: "Naiad Su Sırrı", desc: "Duygusal berraklık kazanıyorsun. Su kenarında yapacağın kısa bir yürüyüş zihnini arındıracak." },
+            { title: "Dryad Orman Bereketi", desc: "Doğayla bağın güçleniyor. Sabırlı ve kararlı adımlarla hedeflerine ulaşacaksın." },
+            { title: "Pleiades Yıldız Tozu", desc: "Yıldızlar senin için hizalandı. Bir dilek tut ve evrene yayılmasına izin ver." }
+        ];
+
+        function spinFairyWheel() {
+            const chosen = wheelOptions[Math.floor(Math.random() * wheelOptions.length)];
+            document.getElementById('wheel-result-display').innerText = `✨ ${chosen.title} ✨`;
+            document.getElementById('wheel-desc-display').innerText = chosen.desc;
+        }
+
+        // --- 7. KANAT ATÖLYESİ ---
+        function forgeWings() {
+            const shape = document.getElementById('wing-shape').value;
+            const color = document.getElementById('wing-color').value;
+            const owner = document.getElementById('wing-owner').value.trim() || "Gezgin Ruh";
+
+            document.getElementById('wing-title-res').innerText = `${owner} - ${shape}`;
+            document.getElementById('wing-desc-res').innerText = `Vitray paleti: ${color} tonlarıyla özenle işlendi ve Kodeks arşivine kaydedildi.`;
+        }
+
+        // --- 8. WIKI KARTLARINI ÇİZME ---
+        function renderWikiGrid() {
+            const grid = document.getElementById('wiki-grid');
+            const countLabel = document.getElementById('article-count');
+            grid.innerHTML = '';
+
+            const filtered = wikiArticles.filter(art => {
+                const matchesCategory = currentFilter === 'hepsi' || art.category === currentFilter;
+                const matchesSearch = art.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      art.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      art.lore.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            countLabel.innerText = `Toplam ${filtered.length} Madde Listeleniyor`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-stone-400 italic">Aradığınız kriterlere uygun kadim bir madde bulunamadı...</div>`;
+                return;
+            }
+
+            filtered.forEach(art => {
+                const isFav = favoriteIds.includes(art.id);
+                const card = document.createElement('div');
+                card.className = 'parchment-card p-6 rounded-2xl cursor-pointer flex flex-col justify-between space-y-4 relative';
+                card.onclick = () => { playChime(); openWikiModal(art); };
+
+                let catName = {
+                    'kabile': 'Peri Sınıfı',
+                    'yildiz': 'Yıldız',
+                    'takvim': 'Takvim',
+                    'olay': 'Göksel Olay',
+                    'bitki': 'Büyülü Bitki',
+                    'artifact': 'Kadim Eser',
+                    'muzik': 'Peri Şarkısı'
+                }[art.category] || 'Genel';
+
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs uppercase tracking-wider bg-amber-900/10 text-amber-900 px-2.5 py-0.5 rounded-full font-bold border border-amber-900/20">${catName}</span>
+                            <span class="text-amber-700 text-xs font-bold">${art.danger}</span>
+                        </div>
+                        <h3 class="title-font text-lg font-bold text-[#2b1d11]">${art.title}</h3>
+                        <p class="text-xs md:text-sm text-stone-700 leading-relaxed">${art.summary}</p>
+                    </div>
+                    <div class="pt-2 border-t border-amber-900/10 flex justify-between items-center text-xs text-amber-900 font-semibold">
+                        <span>Detaylı Makale ➔</span>
+                        <span onclick="event.stopPropagation(); playChime(); toggleCardFavorite('${art.id}')">${isFav ? '❤️' : '🤍'}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            renderFavoritesList();
+        }
+
+        function toggleCardFavorite(id) {
+            const idx = favoriteIds.indexOf(id);
+            if (idx > -1) {
+                favoriteIds.splice(idx, 1);
+            } else {
+                favoriteIds.push(id);
+            }
+            localStorage.setItem('peri_favs_v100', JSON.stringify(favoriteIds));
+            document.getElementById('fav-count').innerText = favoriteIds.length;
+            renderWikiGrid();
+        }
+
+        function renderFavoritesList() {
+            const favGrid = document.getElementById('favorites-grid');
+            document.getElementById('fav-count').innerText = favoriteIds.length;
+            favGrid.innerHTML = '';
+
+            const favItems = wikiArticles.filter(art => favoriteIds.includes(art.id));
+
+            if (favItems.length === 0) {
+                favGrid.innerHTML = `<div class="col-span-full text-center py-6 text-stone-400 italic">Henüz favori not defterine eklenmiş madde yok. Kartlardaki kalp simgesine dokunabilirsiniz.</div>`;
+                return;
+            }
+
+            favItems.forEach(art => {
+                const card = document.createElement('div');
+                card.className = 'parchment-card p-5 rounded-2xl cursor-pointer flex flex-col justify-between space-y-3';
+                card.onclick = () => { playChime(); openWikiModal(art); };
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-amber-800">⭐ Favori Madde</span>
+                        <h4 class="title-font font-bold text-base text-[#2b1d11]">${art.title}</h4>
+                        <p class="text-xs text-stone-700">${art.summary}</p>
+                    </div>
+                `;
+                favGrid.appendChild(card);
+            });
+        }
+
+        function filterCategory(cat) {
+            currentFilter = cat;
+            renderWikiGrid();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.trim();
+            renderWikiGrid();
+        }
+
+        // --- 9. MODAL YÖNETİMİ ---
+        const modal = document.getElementById('wiki-modal');
+        const modalBox = document.getElementById('modal-box');
+        const modalTitle = document.getElementById('modal-title');
+        const modalCatBadge = document.getElementById('modal-cat-badge');
+        const modalDangerBadge = document.getElementById('modal-danger-badge');
+        const modalHabitat = document.getElementById('modal-habitat');
+        const modalBodyLore = document.getElementById('modal-body-lore');
+        const modalBodyRituel = document.getElementById('modal-body-rituel');
+        const modalFavBtn = document.getElementById('modal-fav-btn');
+
+        function openWikiModal(art) {
+            currentModalArticle = art;
+            modalTitle.innerText = art.title;
+            let catName = {
+                'kabile': 'Peri Sınıfı',
+                'yildiz': 'Yıldız',
+                'takvim': 'Takvim',
+                'olay': 'Göksel Olay',
+                'bitki': 'Büyülü Bitki',
+                'artifact': 'Kadim Eser',
+                'muzik': 'Peri Şarkısı'
+            }[art.category] || 'Madde';
+
+            modalCatBadge.innerText = catName;
+            modalDangerBadge.innerText = art.danger;
+            modalHabitat.innerText = `Yaşam Alanı / Köken: ${art.habitat}`;
+            modalBodyLore.innerHTML = art.lore;
+            modalBodyRituel.innerHTML = `<p><strong>Büyüsel Pratik ve Ritüel:</strong></p><p class="italic text-stone-700">${art.rituel}</p>`;
+
+            updateModalFavButton();
+            switchModalTab('lore');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalBox.classList.remove('scale-95');
+                modalBox.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeWikiModal() {
+            playChime();
+            modal.classList.add('opacity-0');
+            modalBox.classList.remove('scale-100');
+            modalBox.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeWikiModal();
+        });
+
+        function switchModalTab(tab) {
+            const loreBtn = document.getElementById('tab-lore-btn');
+            const rituelBtn = document.getElementById('tab-rituel-btn');
+            if (tab === 'lore') {
+                loreBtn.className = "px-4 py-2 border-b-2 border-amber-900 text-amber-900 font-bold";
+                rituelBtn.className = "px-4 py-2 border-b-2 border-transparent text-stone-600 hover:text-amber-900";
+                modalBodyLore.classList.remove('hidden');
+                modalBodyRituel.classList.add('hidden');
+            } else {
+                rituelBtn.className = "px-4 py-2 border-b-2 border-amber-900 text-amber-900 font-bold";
+                loreBtn.className = "px-4 py-2 border-b-2 border-transparent text-stone-600 hover:text-amber-900";
+                modalBodyRituel.classList.remove('hidden');
+                modalBodyLore.classList.add('hidden');
+            }
+        }
+
+        function toggleModalFavorite() {
+            if (!currentModalArticle) return;
+            toggleCardFavorite(currentModalArticle.id);
+            updateModalFavButton();
+        }
+
+        function updateModalFavButton() {
+            if (!currentModalArticle) return;
+            const isFav = favoriteIds.includes(currentModalArticle.id);
+            if (isFav) {
+                modalFavBtn.innerText = "❤️ Favorilerden Çıkar";
+                modalFavBtn.className = "px-4 py-2 bg-pink-100 text-pink-900 rounded-full text-xs font-bold tracking-wider hover:bg-pink-200 transition-colors border border-pink-300";
+            } else {
+                modalFavBtn.innerText = "🤍 Favorilere Ekle";
+                modalFavBtn.className = "px-4 py-2 bg-stone-200 text-amber-900 rounded-full text-xs font-bold tracking-wider hover:bg-stone-300 transition-colors border border-amber-800/30";
+            }
+        }
+
+        function openRandomArticle() {
+            const randomIndex = Math.floor(Math.random() * wikiArticles.length);
+            openWikiModal(wikiArticles[randomIndex]);
+        }
+
+        // --- 10. LAB SEKMELERİ VE ARAÇLARI ---
+        function switchLabTab(tabName) {
+            ['potion', 'cevirici', 'name', 'dream', 'botanik'].forEach(t => {
+                document.getElementById(`lab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-tab-${t}`).classList.remove('active');
+            });
+            document.getElementById(`lab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`btn-tab-${tabName}`).classList.add('active');
+        }
+
+        // İksir
+        function brewPotion() {
+            const p1 = document.getElementById('pot-1').value;
+            const p2 = document.getElementById('pot-2').value;
+            const p3 = document.getElementById('pot-3').value;
+
+            const potions = [
+                { name: "✨ Zihinsel Berraklık ve Yıldız Rüyası İksiri", desc: `${p1}, ${p2} ve ${p3} birleşimiyle demlendi. Bu iksir rüyalarınızda geleceği görmenizi ve zihinsel yorgunluktan arınmanızı sağlar.` },
+                { name: "🌸 Sonsuz Bahar Neşesi İksiri", desc: `${p1}, ${p2} ve ${p3} özleri karıştırıldı. İçenlere Solis güneş perilerinin neşesini ve tükenmez bir enerji aşılar.` },
+                { name: "🌙 Kadim Gece ve Şifa İksiri", desc: `${p1} ile güçlendirilen ${p2} ve ${p3} harmanı. Gece kabuslarını uzaklaştırır, ruhsal yaraları hızla sarar.` }
+            ];
+
+            const chosen = potions[Math.floor(Math.random() * potions.length)];
+            const resDiv = document.getElementById('potion-result');
+            document.getElementById('pot-title').innerText = chosen.name;
+            document.getElementById('pot-desc').innerText = chosen.desc;
+            resDiv.classList.remove('hidden');
+        }
+
+        // Çevirici
+        function translateToFairy() {
+            const text = document.getElementById('translate-input').value.trim();
+            if(!text) return;
+            const fairyMap = {'a': 'aê', 'b': 'bl', 'c': 'ch', 'd': 'dh', 'e': 'el', 'f': 'ph', 'g': 'gh', 'h': 'th', 'i': 'iy', 'j': 'zh', 'k': 'kh', 'l': 'lv', 'm': 'mn', 'n': 'ny', 'o': 'oh', 'p': 'pr', 'r': 'rh', 's': 'sh', 't': 'th', 'u': 'uw', 'v': 'vv', 'y': 'yh', 'z': 'zh'};
+            let res = text.toLowerCase().split('').map(char => fairyMap[char] || char).join('');
+            document.getElementById('translate-output').innerText = `✨ ᚠᛖᚱᛁ • ${res.toUpperCase()} • ᚨᛖᚦᛖᚱᛁᚨ ✨`;
+            document.getElementById('translate-result').classList.remove('hidden');
+        }
+
+        function translateToRunic() {
+            const text = document.getElementById('translate-input').value.trim();
+            if(!text) return;
+            const runicMap = {'a': 'ᚨ', 'b': 'ᛒ', 'c': 'ᚲ', 'd': 'ᛞ', 'e': 'ᛖ', 'f': 'ᚠ', 'g': 'ᚷ', 'h': 'ᚺ', 'i': 'ᛁ', 'j': 'ᛃ', 'k': 'ᚲ', 'l': 'ᛚ', 'm': 'ᛗ', 'n': 'ᚾ', 'o': 'ᛟ', 'p': 'ᛈ', 'r': 'ᚱ', 's': 'ᛋ', 't': 'ᛏ', 'u': 'ᚢ', 'v': 'ᚹ', 'y': 'ᛦ', 'z': 'ᛉ'};
+            let res = text.toLowerCase().split('').map(char => runicMap[char] || char).join(' ');
+            document.getElementById('translate-output').innerText = `🪨 ${res} 🪨`;
+            document.getElementById('translate-result').classList.remove('hidden');
+        }
+
+        // İsim Üreteci
+        const namePrefixes = ["Ael", "Lys", "Vesper", "Sera", "Thal", "Zephyr", "Astra", "Elowen", "Mel", "Sol", "Nyx", "Orion"];
+        const nameSuffixes = ["ia", "ora", "is", "th", "iel", "wyn", "en", "aria", "vale", "luna", "isla", "eth"];
+        const nameTitles = ["Vitray Camların Bekçisi", "Sedef Göletlerin Şarkıcısı", "Yıldız Tozu Dokuyucusu", "Şafak Vakti Muhafızı", "Ay Işığı Gezgini", "Orman Fısıltısı"];
+
+        function generateFairyName() {
+            const p = namePrefixes[Math.floor(Math.random() * namePrefixes.length)];
+            const s = nameSuffixes[Math.floor(Math.random() * nameSuffixes.length)];
+            const t = nameTitles[Math.floor(Math.random() * nameTitles.length)];
+            document.getElementById('generated-name-display').innerText = `✨ ${p}${s} ✨`;
+            document.getElementById('generated-desc').innerText = `Unvanınız: ${t}. Bu isim antik vitray arşivlerine başarıyla kaydedildi.`;
+        }
+
+        // Rüya Yorumcusu
+        function interpretDream() {
+            const val = document.getElementById('dream-input').value.trim();
+            if(!val) return;
+            const interpretations = [
+                { title: "🌙 Selene'nin Rüya Mesajı", desc: "Gördüğünüz bu sembol, içsel sezgilerinizin açığa çıktığını ve yakında ruhsal bir huzura ereceğinizi müjdeliyor." },
+                { title: "⭐ Pleiades Yıldız Kehaneti", desc: "Rüyanızda parlayan öğeler, uzun süredir aradığınız bir cevabın yakında karşınıza çıkacağına işaret ediyor." },
+                { title: "🌿 Orman Perisi İşareti", desc: "Doğayla olan bağınızı güçlendirmeniz ve kendinize biraz zaman ayırmanız gerektiğinin kadim bir hatırlatıcısıdır." }
+            ];
+            const chosen = interpretations[Math.floor(Math.random() * interpretations.length)];
+            document.getElementById('dream-title').innerText = chosen.title;
+            document.getElementById('dream-desc').innerText = chosen.desc;
+            document.getElementById('dream-result').classList.remove('hidden');
+        }
+
+        // Botanik Bahçe
+        function showHerb(name, desc) {
+            document.getElementById('herb-title').innerText = `🌿 ${name}`;
+            document.getElementById('herb-desc').innerText = desc;
+            document.getElementById('herb-result').classList.remove('hidden');
+        }
+
+        // Sayfa yüklendiğinde
+        window.onload = function() {
+            renderWikiGrid();
+            document.getElementById('fav-count').innerText = favoriteIds.length;
+        }
+    </script>
+</body>
+</html>
+```
