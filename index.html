@@ -1,0 +1,309 @@
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viktorya Dönemi İngiliz Edebiyatı</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display & Lora -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Vintage Color Palette */
+            --color-parchment: #f4e9d5; /* Sepia / Antique Paper */
+            --color-ink: #3b2b20;       /* Dark Sepia for text */
+            --color-burgundy: #5c0919;  /* Dark Burgundy */
+            --color-gold: #c5a059;      /* Antique Gold */
+            --color-deep-green: #1f3324;/* Deep Green */
+        }
+
+        body {
+            background-color: var(--color-parchment);
+            color: var(--color-ink);
+            font-family: 'Lora', serif;
+            /* Subtle parchment texture overlay using SVG noise */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, .title-font {
+            font-family: 'Playfair Display', serif;
+            color: var(--color-burgundy);
+        }
+
+        /* Ornate Double Border Effect */
+        .victorian-border {
+            border: 4px double var(--color-gold);
+            padding: 8px;
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .victorian-border-inner {
+            border: 1px solid var(--color-gold);
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* Beautiful Drop Cap for Introduction */
+        .drop-cap::first-letter {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            float: left;
+            line-height: 0.8;
+            padding-right: 0.5rem;
+            padding-top: 0.2rem;
+            color: var(--color-burgundy);
+        }
+
+        /* Elegant Card Hover Transitions */
+        .author-card {
+            background: linear-gradient(145deg, rgba(244, 233, 213, 0.9) 0%, rgba(220, 205, 175, 0.4) 100%);
+            border: 1px solid var(--color-gold);
+            position: relative;
+            transition: all 0.5s ease;
+            box-shadow: 0 4px 15px rgba(59, 43, 32, 0.1);
+        }
+
+        .author-card::before {
+            content: '';
+            position: absolute;
+            top: 5px; left: 5px; right: 5px; bottom: 5px;
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .author-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(92, 9, 25, 0.2);
+            border-color: var(--color-burgundy);
+            background: linear-gradient(145deg, rgba(250, 243, 230, 0.9) 0%, rgba(230, 215, 185, 0.6) 100%);
+        }
+
+        .author-card:hover::before {
+            border-color: var(--color-burgundy);
+        }
+
+        /* Monogram Avatar Style */
+        .monogram {
+            width: 80px;
+            height: 80px;
+            border: 2px solid var(--color-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--color-parchment);
+            background-color: var(--color-deep-green);
+            margin: 0 auto 1rem auto;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            transition: background-color 0.4s ease;
+        }
+
+        .author-card:hover .monogram {
+            background-color: var(--color-burgundy);
+        }
+
+        /* Custom selection color */
+        ::selection {
+            background-color: var(--color-burgundy);
+            color: var(--color-parchment);
+        }
+
+        /* Divider Flourish */
+        .flourish {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        .flourish::before, .flourish::after {
+            content: "";
+            height: 1px;
+            background: var(--color-gold);
+            flex: 1;
+            max-width: 150px;
+        }
+        .flourish svg {
+            margin: 0 15px;
+            fill: var(--color-burgundy);
+            width: 30px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen p-4 md:p-8 lg:p-12">
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto victorian-border shadow-2xl">
+        <div class="victorian-border-inner bg-opacity-50">
+            
+            <!-- Header Section -->
+            <header class="text-center mb-12">
+                <p class="text-sm tracking-[0.3em] uppercase mb-2 text-[#c5a059] font-semibold">İngiliz Edebiyatının Altın ve Karanlık Çağı</p>
+                <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">Viktorya Dönemi <br> <span class="text-3xl md:text-5xl italic font-normal text-[#3b2b20]">İngiliz Edebiyatı</span></h1>
+                <p class="text-lg md:text-xl italic text-[#3b2b20]">(1837 - 1901)</p>
+                
+                <div class="flourish">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2ZM12 6.8L10.8 10.8L6.8 12L10.8 13.2L12 17.2L13.2 13.2L17.2 12L13.2 10.8L12 6.8Z" />
+                    </svg>
+                </div>
+            </header>
+
+            <!-- Introduction -->
+            <section class="mb-16 max-w-3xl mx-auto text-justify">
+                <p class="drop-cap text-lg md:text-xl mb-4">
+                    Kraliçe Victoria'nın 1837'de tahta çıkışından 1901'deki ölümüne kadar geçen süreyi kapsayan bu eşsiz dönem, İngiltere'nin siyasi, kültürel ve edebi tarihinde derin, silinmez izler bırakmıştır. Sanayi Devrimi'nin getirdiği büyük fiziksel ve toplumsal değişimler, sınıflar arası derinleşen uçurumlar ve ahlaki sorgulamalar, dönemin edebi eserlerine doğrudan yön vermiştir.
+                </p>
+                <p class="text-lg md:text-xl">
+                    Viktorya dönemi edebiyatı; bir yanda imparatorluğun görkemi ve bilimsel aydınlanmanın gururunu taşırken, diğer yanda yoksulluk, adaletsizlik ve varoluşsal krizlerin karanlık gölgelerini barındırır. Bu zıtlıklar, roman türünün altın çağını yaşamasına ve bugün bile başucu kitabı sayılan şaheserlerin doğmasına zemin hazırlamıştır.
+                </p>
+            </section>
+
+            <div class="flourish">
+                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M256 32C192.4 95.6 136 128 80 128C35.8 128 0 163.8 0 208C0 252.2 46.4 288 80 288C136 288 192.4 320.4 256 384C319.6 320.4 376 288 432 288C465.6 288 512 252.2 512 208C512 163.8 476.2 128 432 128C376 128 319.6 95.6 256 32Z" />
+                </svg>
+            </div>
+
+            <!-- Key Themes Section -->
+            <section class="mb-16">
+                <h2 class="text-3xl text-center mb-10 uppercase tracking-widest font-semibold text-[#1f3324]">Ana Temalar</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Theme 1 -->
+                    <article class="p-6 border-l-4 border-[#c5a059] bg-white bg-opacity-20 hover:bg-opacity-40 transition duration-300">
+                        <h3 class="text-2xl mb-2 flex items-center gap-2">
+                            <span class="text-[#c5a059] text-3xl">I.</span> Sanayi Devrimi ve Şehirleşme
+                        </h3>
+                        <p class="text-[0.95rem]">
+                            Makineleşmenin ve fabrikalaşmanın hız kazanması, kırsaldan Londra gibi büyük şehirlere göçü tetikledi. Yazarlar; çocuk işçiliği, korkunç çalışma koşulları, kirlilik ve yoksulluk gibi Sanayi Devrimi'nin karanlık yüzünü eserlerine yansıttılar.
+                        </p>
+                    </article>
+
+                    <!-- Theme 2 -->
+                    <article class="p-6 border-l-4 border-[#c5a059] bg-white bg-opacity-20 hover:bg-opacity-40 transition duration-300">
+                        <h3 class="text-2xl mb-2 flex items-center gap-2">
+                            <span class="text-[#c5a059] text-3xl">II.</span> Toplumsal Ahlak ve Katı Kurallar
+                        </h3>
+                        <p class="text-[0.95rem]">
+                            "Viktorya dönemi değerleri" olarak bilinen saygınlık, görev bilinci, cinsel baskı ve katı aile kuralları toplumun bel kemiğiydi. Edebiyat, hem bu idealize edilmiş ahlakı överken hem de ikiyüzlülüğünü acımasızca eleştirdi.
+                        </p>
+                    </article>
+
+                    <!-- Theme 3 -->
+                    <article class="p-6 border-l-4 border-[#c5a059] bg-white bg-opacity-20 hover:bg-opacity-40 transition duration-300">
+                        <h3 class="text-2xl mb-2 flex items-center gap-2">
+                            <span class="text-[#c5a059] text-3xl">III.</span> Bilim ve Din Çatışması
+                        </h3>
+                        <p class="text-[0.95rem]">
+                            Charles Darwin'in 1859'da yayımlanan <em>Türlerin Kökeni</em> adlı eseri ve jeolojideki yeni keşifler, İncil'in yaratılış hikayesiyle çelişerek toplumda derin varoluşsal krizlere ve inanç kaybına yol açtı. Bu melankoli edebiyata derinden işledi.
+                        </p>
+                    </article>
+
+                    <!-- Theme 4 -->
+                    <article class="p-6 border-l-4 border-[#c5a059] bg-white bg-opacity-20 hover:bg-opacity-40 transition duration-300">
+                        <h3 class="text-2xl mb-2 flex items-center gap-2">
+                            <span class="text-[#c5a059] text-3xl">IV.</span> Realizm (Gerçekçilik)
+                        </h3>
+                        <p class="text-[0.95rem]">
+                            Romantizmin aşırı duygusallığından uzaklaşan yazarlar, orta sınıfın ve alt sınıfın hayatını, psikolojik derinlikleri ve toplumsal sorunları olduğu gibi, tüm çıplaklığı ve detaylarıyla yansıtmayı amaçladılar.
+                        </p>
+                    </article>
+
+                </div>
+            </section>
+
+            <div class="flourish">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+                </svg>
+            </div>
+
+            <!-- Notable Figures Section -->
+            <section class="mb-12">
+                <h2 class="text-3xl text-center mb-10 uppercase tracking-widest font-semibold text-[#1f3324]">Önemli Yazarlar</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Charles Dickens -->
+                    <div class="author-card p-6 text-center">
+                        <div class="monogram">CD</div>
+                        <h3 class="text-2xl font-bold mb-2">Charles Dickens</h3>
+                        <p class="text-sm italic text-[#c5a059] mb-4">(1812 - 1870)</p>
+                        <p class="mb-4 text-sm px-4">
+                            Viktorya döneminin tartışmasız en büyük romancısıdır. Eserlerinde yoksulluğu, yetimhaneleri, suç dünyasını ve adaletsiz eğitim sistemini eşsiz bir mizah ve derin bir merhametle ele alarak toplumsal reformlara önayak olmuştur.
+                        </p>
+                        <div class="border-t border-[#c5a059] border-opacity-30 pt-3">
+                            <span class="block text-xs uppercase tracking-widest font-semibold text-[#5c0919] mb-1">Öne Çıkan Eserleri</span>
+                            <span class="text-sm italic">İki Şehrin Hikayesi, Oliver Twist, Büyük Umutlar</span>
+                        </div>
+                    </div>
+
+                    <!-- Brontë Sisters -->
+                    <div class="author-card p-6 text-center">
+                        <div class="monogram">B</div>
+                        <h3 class="text-2xl font-bold mb-2">Brontë Kardeşler</h3>
+                        <p class="text-sm italic text-[#c5a059] mb-4">(Charlotte, Emily, Anne)</p>
+                        <p class="mb-4 text-sm px-4">
+                            Gotik unsurları, derin psikolojik tahlilleri ve dönemin normlarına meydan okuyan güçlü, bağımsız kadın karakterleri edebiyat dünyasına kazandırmışlardır. Kadınların iç dünyasını tutkulu bir gerçekçilikle yansıttılar.
+                        </p>
+                        <div class="border-t border-[#c5a059] border-opacity-30 pt-3">
+                            <span class="block text-xs uppercase tracking-widest font-semibold text-[#5c0919] mb-1">Öne Çıkan Eserleri</span>
+                            <span class="text-sm italic">Jane Eyre (Charlotte), Uğultulu Tepeler (Emily)</span>
+                        </div>
+                    </div>
+
+                    <!-- Thomas Hardy -->
+                    <div class="author-card p-6 text-center">
+                        <div class="monogram">TH</div>
+                        <h3 class="text-2xl font-bold mb-2">Thomas Hardy</h3>
+                        <p class="text-sm italic text-[#c5a059] mb-4">(1840 - 1928)</p>
+                        <p class="mb-4 text-sm px-4">
+                            Dönemin sonlarına doğru yazan Hardy, insanın doğa, zalim bir kader ve değişen toplumsal düzen karşısındaki çaresizliğini melankolik ve natüralist bir dille kurgulamıştır. Trajik sonlar eserlerinin vazgeçilmezidir.
+                        </p>
+                        <div class="border-t border-[#c5a059] border-opacity-30 pt-3">
+                            <span class="block text-xs uppercase tracking-widest font-semibold text-[#5c0919] mb-1">Öne Çıkan Eserleri</span>
+                            <span class="text-sm italic">Tess, Çılgın Kalabalıktan Uzak, Jude the Obscure</span>
+                        </div>
+                    </div>
+
+                    <!-- Oscar Wilde -->
+                    <div class="author-card p-6 text-center">
+                        <div class="monogram">OW</div>
+                        <h3 class="text-2xl font-bold mb-2">Oscar Wilde</h3>
+                        <p class="text-sm italic text-[#c5a059] mb-4">(1854 - 1900)</p>
+                        <p class="mb-4 text-sm px-4">
+                            "Sanat için sanat" (Estetizm) akımının en büyük savunucularındandır. Zekice yazılmış diyalogları, keskin toplumsal hicvi ve kendi trajik hayatıyla geç Viktorya döneminin en renkli ve aykırı figürüdür.
+                        </p>
+                        <div class="border-t border-[#c5a059] border-opacity-30 pt-3">
+                            <span class="block text-xs uppercase tracking-widest font-semibold text-[#5c0919] mb-1">Öne Çıkan Eserleri</span>
+                            <span class="text-sm italic">Dorian Gray'in Portresi, Ciddi Olmanın Önemi</span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="mt-16 text-center pt-8 border-t border-[#c5a059] border-opacity-50">
+                <p class="title-font text-xl text-[#5c0919] mb-2">Sanat ve Edebiyat Daima Yaşar</p>
+                <p class="text-sm italic opacity-75">Hazırlanan bu dijital sayfa, 19. yüzyılın o ihtişamlı mürekkep kokusunu günümüze taşımak için tasarlanmıştır.</p>
+                <p class="text-xs mt-4 tracking-widest uppercase opacity-60">© 1837 - 1901 İngiliz Edebiyatı Arşivi</p>
+            </footer>
+
+        </div>
+    </main>
+
+</body>
+</html>
+```
