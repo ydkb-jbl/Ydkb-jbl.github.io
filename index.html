@@ -1,0 +1,585 @@
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esrarengiz Kasaba: 4. Günlük</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Special+Elite&family=Creepster&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --cover-red: #3a0808;
+            --cover-dark: #120202;
+            --gold: #d4af37;
+            --parchment: #e8d8c3;
+            --parchment-dark: #b89f7d;
+            --ink: #2b1f15;
+            --blood-red: #8a0303;
+        }
+
+        body {
+            background-color: #050505;
+            color: var(--ink);
+            overflow-x: hidden;
+            font-family: 'Special Elite', monospace;
+        }
+
+        h1, h2, h3, .mystic-title {
+            font-family: 'Cinzel Decorative', serif;
+        }
+
+        .academic-text {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Kapak (Cover) */
+        #cover {
+            background: radial-gradient(circle, var(--cover-red) 0%, var(--cover-dark) 100%);
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+            border-left: 30px solid #0f0303;
+            transition: opacity 1.2s ease, transform 1.2s ease;
+        }
+        
+        #cover::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://www.transparenttextures.com/patterns/black-scales.png');
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .golden-hand {
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 2px #000);
+            transition: all 0.5s ease;
+            cursor: pointer;
+        }
+        .golden-hand:hover {
+            filter: drop-shadow(0 0 35px rgba(212, 175, 55, 0.9)) drop-shadow(0 0 5px #ffeb73);
+            transform: scale(1.05);
+        }
+
+        /* İç Sayfalar (Interior) */
+        #interior {
+            background-color: var(--parchment);
+            background-image: 
+                radial-gradient(circle, transparent 20%, var(--parchment-dark) 150%),
+                url('https://www.transparenttextures.com/patterns/aged-paper.png');
+            box-shadow: inset 0 0 80px rgba(71, 47, 23, 0.6), 0 0 30px rgba(0,0,0,0.8);
+            border: 2px solid #8c6e45;
+            transition: opacity 1s ease;
+        }
+
+        .page-container {
+            display: none;
+            animation: fadeInPage 0.8s ease forwards;
+        }
+        .page-container.active {
+            display: block;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sayfa Okları */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+            color: rgba(60, 30, 10, 0.5);
+            cursor: pointer;
+            z-index: 30;
+            transition: all 0.3s ease;
+            padding: 20px;
+            background: rgba(232, 216, 195, 0.2);
+            border-radius: 50%;
+            backdrop-filter: blur(2px);
+        }
+        .nav-arrow:hover {
+            color: rgba(138, 3, 3, 0.9);
+            text-shadow: 0 0 10px rgba(138, 3, 3, 0.5);
+            background: rgba(232, 216, 195, 0.5);
+        }
+        #prev-btn { left: 20px; }
+        #next-btn { right: 20px; }
+
+        /* Polaroid Kartlar */
+        .polaroid {
+            background: #fbfbfb;
+            padding: 12px 12px 30px 12px;
+            box-shadow: 2px 6px 15px rgba(0,0,0,0.5);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+        .polaroid:hover {
+            transform: scale(1.08) rotate(0deg) !important;
+            box-shadow: 5px 20px 30px rgba(0,0,0,0.7);
+            z-index: 20;
+        }
+        .polaroid-img-wrapper {
+            height: 220px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .taped-corner {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-4deg);
+            width: 90px;
+            height: 28px;
+            background: rgba(255, 255, 200, 0.6);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            z-index: 5;
+        }
+
+        /* Yan Panel / Detay Görünümü */
+        #side-panel-overlay {
+            backdrop-filter: blur(4px);
+        }
+        #side-panel {
+            background-color: var(--parchment);
+            background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+            border-left: 8px solid #5c3a21;
+            box-shadow: -15px 0 40px rgba(0,0,0,0.9);
+        }
+
+        /* Glitch ve Efektler */
+        .glitch-text {
+            font-family: 'Creepster', cursive;
+            position: relative;
+            color: var(--blood-red);
+            animation: glitch 2s infinite;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            10% { transform: translate(-3px, 2px); text-shadow: 2px 0 red, -2px 0 blue; }
+            20% { transform: translate(3px, -2px); text-shadow: -2px 0 red, 2px 0 blue; }
+            30% { transform: translate(0); text-shadow: none; }
+            100% { transform: translate(0) }
+        }
+
+        .ink-stain {
+            position: absolute;
+            background: radial-gradient(circle, rgba(20,15,10,0.85) 0%, transparent 60%);
+            border-radius: 50%;
+            filter: blur(3px);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #5c3a21; border-radius: 4px; }
+    </style>
+</head>
+<body class="antialiased selection:bg-red-900 selection:text-white">
+
+    <!-- 1) KAPAK SAYFASI -->
+    <header id="cover" class="fixed inset-0 z-50 flex flex-col items-center justify-center">
+        <div class="text-center z-20" onclick="openJournal()">
+            <h1 class="text-5xl md:text-7xl text-[#d4af37] mb-12 drop-shadow-[0_8px_8px_rgba(0,0,0,1)] tracking-widest uppercase">
+                Kayıp Cilt IV
+            </h1>
+            
+            <div class="relative inline-block golden-hand" title="Mührü Kırmak İçin Dokun">
+                <svg width="220" height="280" viewBox="0 0 200 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M40 120 C 30 70, 50 50, 60 90 C 55 40, 75 20, 85 80 C 85 20, 110 10, 115 70 C 120 15, 145 15, 140 75 C 145 30, 165 40, 155 90 C 165 60, 185 70, 175 110 L 160 200 C 150 240, 60 240, 45 200 Z" fill="#d4af37" stroke="#8c7322" stroke-width="4"/>
+                    <path d="M 70 140 Q 100 160 130 140" stroke="#8c7322" stroke-width="3" fill="none"/>
+                    <path d="M 80 160 Q 100 180 120 160" stroke="#8c7322" stroke-width="3" fill="none"/>
+                </svg>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-4 text-7xl font-bold" style="font-family: 'Cinzel Decorative'; color: #3a0808; text-shadow: 1px 1px 0px rgba(255,255,255,0.4), -1px -1px 0px rgba(0,0,0,0.9);">
+                    4
+                </div>
+            </div>
+            
+            <p class="mt-12 text-xl text-yellow-600/70 font-bold tracking-widest animate-pulse">
+                [ Sayfaları aralamak için ele dokun ]
+            </p>
+        </div>
+    </header>
+
+    <!-- 2) İÇ SAYFALAR (GİZLİ BAŞLAR) -->
+    <main id="interior" class="min-h-screen hidden relative pt-16 pb-24 px-4 sm:px-12 md:px-24">
+        
+        <!-- Sayfa Yönlendirme Okları -->
+        <div id="prev-btn" class="nav-arrow" onclick="changePage(-1)" style="display: none;">
+            <i class="fa-solid fa-chevron-left"></i>
+        </div>
+        <div id="next-btn" class="nav-arrow" onclick="changePage(1)">
+            <i class="fa-solid fa-chevron-right"></i>
+        </div>
+
+        <!-- Dekoratif Mürekkep Lekeleri -->
+        <div class="ink-stain w-48 h-48 top-10 left-10"></div>
+        <div class="ink-stain w-32 h-24 bottom-20 right-20"></div>
+
+        <div class="max-w-7xl mx-auto relative z-10">
+            
+            <!-- SAYFA 1: Karakterler -->
+            <div id="page-1" class="page-container active">
+                <div class="text-center mb-12 border-b-2 border-amber-900/50 pb-6">
+                    <h2 class="text-4xl text-amber-950 font-bold mb-4 uppercase tracking-widest">Bölüm I: Zihnin Çatlakları (Karakterler)</h2>
+                    <p class="text-lg text-amber-900 font-semibold max-w-3xl mx-auto academic-text italic">
+                        "İnsan zihni, karanlık bir orman gibidir. Ağaçların ardında nelerin saklandığını bilmek, çoğu zaman deliliğin ilk adımıdır."
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="grid-page-1"></div>
+            </div>
+
+            <!-- SAYFA 2: Yaratıklar / Anomaliler -->
+            <div id="page-2" class="page-container">
+                <div class="text-center mb-12 border-b-2 border-amber-900/50 pb-6">
+                    <h2 class="text-4xl text-amber-950 font-bold mb-4 uppercase tracking-widest">Bölüm II: Gotik Kabuslar (Yaratıklar)</h2>
+                    <p class="text-lg text-amber-900 font-semibold max-w-3xl mx-auto academic-text italic">
+                        "Fizik kurallarının büküldüğü bu ekosistemde, anomaliler sadece bedeni değil, ruhun varoluşsal temelini hedef alıyor."
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10" id="grid-page-2"></div>
+            </div>
+
+            <!-- SAYFA 3: Gizemli Bölgeler -->
+            <div id="page-3" class="page-container">
+                <div class="text-center mb-12 border-b-2 border-amber-900/50 pb-6">
+                    <h2 class="text-4xl text-amber-950 font-bold mb-4 uppercase tracking-widest">Bölüm III: Çürüyen Topraklar (Bölgeler)</h2>
+                    <p class="text-lg text-amber-900 font-semibold max-w-3xl mx-auto academic-text italic">
+                        "Mekanın kendisi bir düşman olabilir mi? Esrarengiz Kasaba'nın coğrafyası, unutulmuş günahların jeolojik bir yansıması gibi."
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10" id="grid-page-3"></div>
+            </div>
+
+        </div>
+        
+        <!-- Sayfa Numarası Göstergesi -->
+        <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 font-bold text-amber-900 text-xl tracking-widest z-20 border-t border-amber-900 pt-2 px-8">
+            SAYFA <span id="page-indicator">I</span>
+        </div>
+    </main>
+
+    <!-- 3) YAN PANEL (LORE VE DETAYLAR) -->
+    <div id="side-panel-overlay" class="fixed inset-0 bg-black/80 z-40 hidden transition-opacity duration-300 opacity-0" onclick="closePanel()"></div>
+    
+    <aside id="side-panel" class="fixed top-0 right-0 w-full md:w-[650px] h-full z-50 transform translate-x-full transition-transform duration-500 ease-in-out overflow-y-auto">
+        <button onclick="closePanel()" class="absolute top-4 right-6 text-4xl text-amber-950 hover:text-red-700 transition-colors z-50 drop-shadow-md">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <div class="p-8 mt-6 relative" id="panel-content">
+            <!-- Dinamik İçerik -->
+        </div>
+    </aside>
+
+    <script>
+        // --- VERİ KÜMESİ (LITERARY & SCHOLARLY TONE) ---
+        const journalData = {
+            page1: [
+                {
+                    id: 'dipper',
+                    name: 'Dipper Pines',
+                    type: 'Tragedya Öznesi',
+                    icon: '<i class="fa-solid fa-tree text-5xl text-emerald-800"></i>',
+                    bgColor: '#16331a',
+                    rotation: -3,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <p>Eski yazların naif maceraperesti, artık epistemolojik bir krizin merkezinde. Dipper'ın gerçeğe olan takıntısı, onu sadece bilinmeyeni keşfetmeye değil, <span class="font-bold text-red-900">bilinmeyenin kendisine dönüşmeye</span> itiyor.</p>
+                            <p><strong>Gotik Bir Yansıma:</strong> Dipper figürü, Lovecraft tarzı kozmik korku edebiyatındaki tipik araştırmacı arketipidir. Amcası Ford'un izinden gitmesi trajik bir kaçınılmazlıktır. Bilgiyi elde etmek uğruna akıl sağlığını feda etme eğilimi, onda bir savunma mekanizmasından ziyade bir yaşayış biçimi haline gelmiştir.</p>
+                            <p>Geceleri günlüğüne kazıdığı şifreler, aslında kendi zihninin çözülen bağlarıdır. Çam ağacı sembolü artık onu koruyan bir tılsım değil, evrensel anomalilerin onu bulması için bir fener işlevi görmektedir.</p>
+                        </div>
+                    `,
+                    note: 'Paranoya bir hastalık değil, bu kasabada hayatta kalma refleksidir.'
+                },
+                {
+                    id: 'mabel',
+                    name: 'Mabel Pines',
+                    type: 'Kozmik Denge Unsuru',
+                    icon: '<i class="fa-solid fa-star text-5xl text-pink-500"></i>',
+                    bgColor: '#4a153a',
+                    rotation: 2,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <p>Mabel'in rengarenk kazaklarının ve bitmek bilmeyen iyimserliğinin altında, evrenin entropik kaosuna kafa tutan derin bir inkar mekanizması yatmaktadır. Rasyonalitenin bittiği yerde başlayan bir absürtlük kalkanıdır.</p>
+                            <p><strong>Felsefi Analiz:</strong> Eğer Dipper "Logos" (Mantık) ise, Mabel saf "Kaos"tur. İnsanlar onu sadece saf ve eğlenceli bulur; oysa onun fizik kurallarını ve mantıksal nedenselliği sırf onlara <em>inanmadığı için</em> bükebilme yetisi vardır.</p>
+                            <p>Bu zıtlık, evrenin dokusunu bir arada tutar. İkizler arasındaki bağın kopması, kasabanın üzerine çökecek kıyametin asıl tetikleyicisi olacaktır. Kayan yıldız, karanlığı deler ancak kendi yörüngesinden saparsa etrafındaki her şeyi yakar.</p>
+                        </div>
+                    `,
+                    note: 'Waddles (Paytak) son zamanlarda düşük frekanslı telepatik sinyaller yayıyor.'
+                },
+                {
+                    id: 'stan',
+                    name: 'Grunkle Stan',
+                    type: 'Güvenilmez Anlatıcı',
+                    icon: '<i class="fa-solid fa-mask text-5xl text-yellow-700"></i>',
+                    bgColor: '#2b1c0b',
+                    rotation: -2,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <p>Stanley Pines'ın varlığı, edebiyattaki kusursuz <strong>"Güvenilmez Anlatıcı" (Unreliable Narrator)</strong> arketipine mükemmel bir örnektir. Yıllarca takındığı maskeler o kadar kalınlaşmıştır ki, altındaki gerçek yüz gotik atmosferin karanlığında eriyip kaybolmuştur.</p>
+                            <p><strong>Psikolojik Motifler:</strong> Bill Cipher zihninden silindiğinde anılarının geri dönmesi, aslında bir lütuf değil, zihinsel bir yamadır. Stan'in belleğindeki çatlaklarda hala boşluklar bulunuyor. Yaptığı fedakarlığın ağırlığı, ruhunda geri dönülmez hasarlar bıraktı.</p>
+                            <p>Kendi çıkarları için yalan söyleyen bir dolandırıcıdan, çoklu evreni kurtaran bir kahramana dönüşümü trajikomiktir. Ancak şu soru hala geçerliliğini koruyor: O zihin silindiğinde *başka* hangi kapılar aralandı?</p>
+                        </div>
+                    `,
+                    note: 'Gizemli Kulübe bir turistik mekan değil, psikolojik bir siperdir.'
+                },
+                {
+                    id: 'bill',
+                    name: 'Bill Cipher',
+                    type: 'Nihilistik Entropi',
+                    icon: '<i class="fa-solid fa-caret-up text-5xl text-yellow-400"></i>',
+                    bgColor: '#000000',
+                    rotation: 4,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <h3 class="glitch-text text-3xl mb-4 text-center">OMNES VIDENTES OCULUS</h3>
+                            <p>Bill'in Stan'in zihninde yandığı sanrısı, sadece boyutumuzun algılayabildiği doğrusal zaman çizelgesinde geçerlidir. Axolotl kehanetine göre saf enerjiden oluşan bir varlık yok edilemez; sadece şekil ve form değiştirir.</p>
+                            <p><strong>Ontolojik Kriz:</strong> Bill Cipher bir karakterden ziyade, evrenin <em>anlamsızlığının</em> (Nihilizm) ete kemiğe (ya da geometriye) bürünmüş halidir. Şimdilerde kasabanın radyo frekanslarında duyulan statik sesler, üçgen çatılarda oluşan mikroskobik mimari bozulmalar onun yavaş yavaş realitemize sızdığını kanıtlıyor.</p>
+                            <div class="text-center my-6">
+                                <span class="text-2xl text-red-900 font-['Creepster'] tracking-widest block transform rotate-2">GERÇEKLİK BİR İLLÜZYON</span>
+                                <span class="text-xl text-red-900 font-['Creepster'] tracking-widest block transform -rotate-1">EVREN BİR HOLOGRAM</span>
+                            </div>
+                        </div>
+                    `,
+                    note: 'HEYKELE YAKLAŞMA. ELİNİ SIKMA.'
+                }
+            ],
+            page2: [
+                {
+                    id: 'shadow',
+                    name: 'Gölge Sürüngeni',
+                    type: 'Biyolojik Anomali',
+                    icon: '<i class="fa-solid fa-spider text-5xl text-purple-800"></i>',
+                    bgColor: '#140c17',
+                    rotation: -3,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <p>Latince nomenklatürü: <em>Noctis Arachnida</em>. Kasabanın kuzey ormanlarında lokalize olmuş, geleneksel karbon tabanlı yaşama ters düşen bir varlık.</p>
+                            <p><strong>Gotik Atmosferin Tezahürü:</strong> Bu yaratık karanlıkta saklanmaz; <span class="font-bold text-red-900">karanlığın ta kendisini inşa eder.</span> Işığı emme kapasitesi, bulunduğu ortamdaki fotonları yok ederek kelimenin tam anlamıyla fiziksel bir körlüğe neden olur. Ancak asıl dehşet, beslenme yöntemindedir: Kurbanlarının etini değil, onların "mutlu anılarını" ve nörolojik umut merkezlerini tüketir.</p>
+                            <p>Karşılaşanlar genellikle katatonik bir melankoliye sürüklenir. Güçlü UV ışınları formunu geçici olarak bozar, ancak tek gerçek zayıflığı <strong>aynalardır</strong>. Kendini gördüğünde ontolojik bir çelişkiye düşer ve donar.</p>
+                        </div>
+                    `,
+                    note: 'Ormanda kendi gölgenin senden uzun olduğunu fark edersen, koş.'
+                },
+                {
+                    id: 'whisper',
+                    name: 'Ormanın Fısıltısı',
+                    type: 'İşitsel Halüsinasyon',
+                    icon: '<i class="fa-solid fa-ear-listen text-5xl text-teal-800"></i>',
+                    bgColor: '#0d1a19',
+                    rotation: 2,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <p>Fiziksel bir formdan yoksun, rüzgarın frekanslarına gizlenmiş parazitik bir bilinç. Esrarengiz Kasaba çamlarının iğneleri arasından estiğinde aktifleşir.</p>
+                            <p><strong>Psikolojik Dehşet (Psychological Horror):</strong> Bu anomali kurbana dışarıdan saldırmaz. Kurbanın kendi iç sesini kopyalar. Önceleri masum şüpheler (<em>"Ocağı açık mı unuttum?"</em>) ekerken, günler geçtikçe bu fısıltılar derin paranoyalara (<em>"Kimse seni sevmiyor, ihanet edecekler"</em>) evrilir.</p>
+                            <p>Akıl sağlığını korumanın tek yolu sağırlaştırıcı bir gürültü yaratmak veya kulakları balmumu ile tıkamaktır (Klasik Odysseus motifi). Kurbanın en derin güvensizliklerini silah olarak kullanır.</p>
+                        </div>
+                    `,
+                    note: 'Kendi zihninden duyduğun sese nasıl karşı koyabilirsin?'
+                },
+                {
+                    id: 'ink',
+                    name: 'Mürekkep İkizi',
+                    type: 'Doppelgänger',
+                    icon: '<i class="fa-solid fa-droplet text-5xl text-gray-900"></i>',
+                    bgColor: '#1a1a1a',
+                    rotation: -4,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <p>Yazarın (Stanford veya Dipper) döktüğü mürekkeplerin, kasabanın boyutsal enerjisiyle reaksiyona girmesi sonucu oluşan karanlık kopyalar.</p>
+                            <p><strong>Doppelgänger Motifi:</strong> Alman folklorunun ve romantik dönemin bu vazgeçilmez öğesi, burada fiziksel bir form bulur. Mürekkep İkizi, orijinal kişinin bastırılmış karanlık dürtülerinin, söyleyemediği yalanların ve gizli kinlerinin somutlaşmış halidir.</p>
+                            <p>Gündüzleri normal bir gölge gibi kurbanı takip eder, geceleri ise iki boyutlu düzlemden çıkarak kurbanın yerini almaya çalışır. Hareketleri tersinedir; sağ eli sol el olarak kullanır ve aynada yansıması yoktur. Çözücü asit veya ateşe karşı kırılgandır ancak yok edildiğinde geride travmatik bir psikolojik leke bırakır.</p>
+                        </div>
+                    `,
+                    note: 'Yazarken dikkat et. Her kelime, sana benzeyen bir canavarı besliyor olabilir.'
+                }
+            ],
+            page3: [
+                {
+                    id: 'clock',
+                    name: 'Unutulmuş Saat Kulesi',
+                    type: 'Mekansal Distorsiyon',
+                    icon: '<i class="fa-solid fa-hourglass-empty text-5xl text-gray-500"></i>',
+                    bgColor: '#242424',
+                    rotation: 3,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <p>Sadece belirli astronomik olaylar sırasında, kasabanın en yoğun sisli bölgelerinde beliren, haritalanmamış gotik bir yapı.</p>
+                            <p><strong>Varoluşsal Sıkıntı (Existential Dread):</strong> Kule, zamanın akışının sarmal haline geldiği bir girdaptır. Birinci kata adım atan biri, kendi geçmişinin yankılarını duyar. Merdivenleri tırmandıkça lineer zaman algısı parçalanır. En üst kattaki çan odasında duran sarkaç, saniyeleri değil, yaşanmamış ihtimalleri sayar.</p>
+                            <p>Kulenin içinde karşılaşılan siluetler ölüler değil, ziyaretçinin hayatta yaptığı farklı seçimler sonucu oluşan alternatif benlikleridir. Çan gece yarısını vurduğunda içerdeyseniz, zaman çizelgesinden tamamen silinirsiniz.</p>
+                        </div>
+                    `,
+                    note: 'Saatin akrebi ve yelkovanı yok. Çünkü zaman seni beklemeyecek.'
+                },
+                {
+                    id: 'library',
+                    name: 'Batık Kütüphane',
+                    type: 'Yasak Bilgi Havuzu',
+                    icon: '<i class="fa-solid fa-book-skull text-5xl text-blue-900"></i>',
+                    bgColor: '#0a192f',
+                    rotation: -2,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <p>Gravity Falls Gölü'nün derinliklerinde, nefes alabilen bir oksijen baloncuğunun içine hapsolmuş antik, Öklid dışı (non-Euclidean) geometriye sahip devasa bir arşiv.</p>
+                            <p><strong>Epistemolojik Dehşet:</strong> Bu mekan, insan zihninin kavramaması gereken evrensel sırların korunduğu yerdir. Kitapların sayfaları deriden yapılmıştır ve yazılar okundukça sürekli değişir. Kütüphanenin mimarisi o kadar çarpıktır ki, koridorlar kendi içine katlanır. Yukarı çıkan merdivenler, sizi bir alt kata götürebilir.</p>
+                            <p>Koruyucuları olan kör rahipler, sese karşı aşırı duyarlıdır. Bir sayfanın hışırtısı, onların asırlar süren uykusunu bölmeye yeterlidir. Burada elde edilen bilgi, er ya da geç okuyucunun aklını talep eder.</p>
+                        </div>
+                    `,
+                    note: 'Tüm soruların cevabı orada. Ancak bedelini ödemeye hazır mısın?'
+                },
+                {
+                    id: 'chasm',
+                    name: 'Yankılanan Uçurum',
+                    type: 'Psikolojik Fay Hattı',
+                    icon: '<i class="fa-solid fa-mountain-sun text-5xl text-stone-700"></i>',
+                    bgColor: '#1f1a18',
+                    rotation: 4,
+                    content: `
+                        <div class="academic-text text-amber-950 text-lg leading-relaxed space-y-4">
+                            <p>Kasabanın güneyindeki dağların dibizliğini temsil eden devasa bir yarık. Dibinin nerede olduğu veya nereye açıldığı tespit edilememiştir.</p>
+                            <p><strong>Katharsis ve Çöküş:</strong> Bu uçurum fiziksel bir boşluk olmaktan çok ruhsal bir aynadır. Eğer uçurumun kenarında durup bağırırsanız, yankı sizin sesinizle dönmez; yankı, sakladığınız en karanlık sırrı veya en büyük pişmanlığınızı fısıldar.</p>
+                            <p>Birçok zayıf iradeli insan, uçurumun sesine dayanamayarak kendilerini aşağı bırakmıştır. Uçurumun dibindeki varlık (eğer varsa), düşenlerin pişmanlıklarıyla beslenen jeolojik bir tanrıyı andırır.</p>
+                        </div>
+                    `,
+                    note: 'Uçuruma uzun süre bakarsan, o da senin içine bakar.'
+                }
+            ]
+        };
+
+        // --- SAYFA YÖNETİMİ ---
+        let currentPage = 1;
+        const totalPages = 3;
+
+        function openJournal() {
+            const cover = document.getElementById('cover');
+            const interior = document.getElementById('interior');
+            
+            cover.style.transform = 'scale(1.5) translateX(-50%)';
+            cover.style.opacity = '0';
+            
+            setTimeout(() => {
+                cover.style.display = 'none';
+                interior.classList.remove('hidden');
+                renderPages();
+                updateNavigation();
+            }, 1000);
+        }
+
+        function changePage(direction) {
+            document.getElementById(`page-${currentPage}`).classList.remove('active');
+            currentPage += direction;
+            document.getElementById(`page-${currentPage}`).classList.add('active');
+            
+            const numerals = ['I', 'II', 'III'];
+            document.getElementById('page-indicator').innerText = numerals[currentPage-1];
+            
+            updateNavigation();
+        }
+
+        function updateNavigation() {
+            document.getElementById('prev-btn').style.display = currentPage > 1 ? 'block' : 'none';
+            document.getElementById('next-btn').style.display = currentPage < totalPages ? 'block' : 'none';
+        }
+
+        // --- KARTLARI OLUŞTURMA (RENDER) ---
+        function renderPages() {
+            for (let i = 1; i <= totalPages; i++) {
+                const container = document.getElementById(`grid-page-${i}`);
+                const dataList = journalData[`page${i}`];
+                
+                dataList.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = `polaroid cursor-pointer group`;
+                    card.style.transform = `rotate(${item.rotation}deg)`;
+                    card.onclick = () => openPanel(item);
+                    
+                    card.innerHTML = `
+                        <div class="taped-corner"></div>
+                        <div class="polaroid-img-wrapper" style="background-color: ${item.bgColor}">
+                            <div class="transform group-hover:scale-125 transition-transform duration-700">
+                                ${item.icon}
+                            </div>
+                        </div>
+                        <div class="mt-5 text-center">
+                            <h3 class="text-2xl font-bold text-amber-950 mb-1" style="font-family: 'Cinzel Decorative'">${item.name}</h3>
+                            <p class="text-sm text-red-900 font-bold border-t border-amber-900/30 pt-2 font-['Special_Elite']">${item.type}</p>
+                        </div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        // --- YAN PANEL (MODAL) ---
+        function openPanel(itemData) {
+            const panel = document.getElementById('side-panel');
+            const overlay = document.getElementById('side-panel-overlay');
+            const content = document.getElementById('panel-content');
+
+            content.innerHTML = `
+                <div class="flex items-center gap-6 mb-8 border-b-2 border-amber-900 pb-6 relative">
+                    <div class="w-24 h-24 rounded flex items-center justify-center border-4 border-amber-900 shadow-[0_0_15px_rgba(0,0,0,0.8)]" style="background-color: ${itemData.bgColor}">
+                        ${itemData.icon.replace('text-5xl', 'text-4xl')}
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-amber-950 uppercase tracking-wider" style="font-family: 'Cinzel Decorative'">${itemData.name}</h2>
+                        <span class="inline-block bg-red-950 text-yellow-100 px-3 py-1 text-sm font-bold mt-2 tracking-widest rounded-sm">${itemData.type}</span>
+                    </div>
+                </div>
+                
+                <div class="mb-10 text-justify">
+                    ${itemData.content}
+                </div>
+                
+                <div class="mt-auto border-t border-dashed border-amber-900 pt-6 relative bg-amber-900/10 p-6 rounded shadow-inner">
+                    <h4 class="text-xl font-bold text-red-900 mb-3 mystic-title">Kişisel Not:</h4>
+                    <p class="font-['Special_Elite'] text-amber-950 text-lg transform -rotate-1 font-bold leading-relaxed">${itemData.note}</p>
+                    <div class="absolute right-4 bottom-2 text-red-900/20 text-6xl">
+                        <i class="fa-solid fa-feather-pointed"></i>
+                    </div>
+                </div>
+            `;
+
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                overlay.classList.add('opacity-100');
+                panel.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closePanel() {
+            const panel = document.getElementById('side-panel');
+            const overlay = document.getElementById('side-panel-overlay');
+
+            panel.classList.add('translate-x-full');
+            overlay.classList.remove('opacity-100');
+            overlay.classList.add('opacity-0');
+            
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 500); 
+        }
+
+        // ESC ile kapatma
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closePanel();
+            if (e.key === 'ArrowRight' && document.getElementById('interior').classList.contains('hidden') === false && currentPage < totalPages) changePage(1);
+            if (e.key === 'ArrowLeft' && document.getElementById('interior').classList.contains('hidden') === false && currentPage > 1) changePage(-1);
+        });
+    </script>
+</body>
+</html>
+```
